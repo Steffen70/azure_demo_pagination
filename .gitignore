@@ -1,0 +1,69 @@
+# .NET and Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.dll
+*.exe
+*.pdb
+*.cache
+*.config
+*.csproj.user
+*.dbmdl
+*.jfm
+*.dbproj.user
+
+# Temporary Files
+*.log
+*.tmp
+*.obj
+*.temp
+*.bak
+*.cache
+*.tlog
+*.results
+TestResults
+
+# Build Results
+[Bb]in/
+[Oo]bj/
+packages/
+
+# ReSharper
+_ReSharper*/
+*.resharper
+*.resharper.user
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# Rider IDE
+.idea/
+
+# macOS specific
+.DS_Store
+
+# Node.js Modules
+node_modules/
+
+# Secrets
+appsettings*.secrets.json
+
+# Entity Framework
+*.edmx
+*.MDF
+*.LDF
+
+# .NET Core publish directory
+publish/
+
+# Custom files/directories
+# Add any custom file extensions or directories that you want to ignore
