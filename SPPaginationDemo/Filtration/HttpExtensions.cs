@@ -1,32 +1,34 @@
+using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SPPaginationDemo.Filtration;
 
 public static class HttpExtensions
 {
-    public static FilteredList<TList> AddFiltrationHeader<TList>(this HttpResponse response, FilteredList<TList> filteredList)
+    private static readonly JsonSerializerOptions Options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    public static async Task<TParams?> GetFiltrationParamsAsync<TParams>(this HttpContext httpContext) where TParams : FiltrationParams
     {
-        AddFiltrationHeader(response, filteredList.Header);
+        // Ensure the request can be read multiple times
+        httpContext.Request.EnableBuffering();
 
-        return filteredList;
-    }
+        // Rewind the request stream to the beginning
+        httpContext.Request.Body.Position = 0;
 
-    public static FilteredList<TList, THeader> AddFiltrationHeader<TList, THeader>(this HttpResponse response, FilteredList<TList, THeader> filteredList)
-        where THeader : FiltrationHeader
-    {
-        AddFiltrationHeader(response, filteredList.Header);
+        // Read the request body and deserialize it into an object of type TParams
+        var body = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
+        var filtrationParams = JsonSerializer.Deserialize<TParams>(body, Options);
 
-        return filteredList;
+        // Rewind the request stream to the beginning so it can be read again by the next middleware
+        httpContext.Request.Body.Position = 0;
+
+        return filtrationParams;
     }
 
     public static void AddFiltrationHeader<THeader>(this HttpResponse response, THeader header)
     {
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        response.Headers.Add("Filtration", JsonSerializer.Serialize(header, options));
+        response.Headers.Add("Filtration", JsonSerializer.Serialize(header, Options));
         response.Headers.Add("Access-Control-Expose-Headers", "Filtration");
     }
 }

@@ -3,20 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SPPaginationDemo.Filtration;
 
-public class FilteredList<TList> : FilteredList<TList, FiltrationHeader>
-{
-    public static async Task<FilteredList<TList>> CreateAsync(
-        IQueryable<TList> source, FiltrationParams @params, IMapper mapper)
-        => mapper.Map<FilteredList<TList>>(await CreateAsync<FiltrationParams>(source, @params, mapper));
-
-    public static async Task<FilteredList<TList>> CreateAndMapInMemoryAsync<TEntity>(
-        IQueryable<TEntity> source, FiltrationParams @params, IMapper mapper)
-        => mapper.Map<FilteredList<TList>>(await CreateAndMapInMemoryAsync<FiltrationParams, TEntity>(source, @params, mapper));
-}
-
 public class FilteredList<TList, THeader> where THeader : FiltrationHeader
 {
-    public THeader Header { get; } = null!;
+    public THeader Header { get; private set; } = null!;
     public List<TList> Result { get; } = new();
 
     public FilteredList() { }
@@ -60,8 +49,6 @@ public class FilteredList<TList, THeader> where THeader : FiltrationHeader
         var header = mapper.Map<THeader>(@params);
 
         header.TotalItems = await source.CountAsync();
-
-        // LIMIT @Limit OFFSET @Offset
 
         var items = await source
             .Skip((header.CurrentPage - 1) * header.PageSize)

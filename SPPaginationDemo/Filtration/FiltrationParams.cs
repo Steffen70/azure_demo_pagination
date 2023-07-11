@@ -1,6 +1,6 @@
 namespace SPPaginationDemo.Filtration;
 
-public class FiltrationParams : IPagination
+public class FiltrationParams
 {
     private const int MaxPageSize = 50;
     private int _pageSize = 10;
@@ -10,13 +10,5 @@ public class FiltrationParams : IPagination
     {
         get => _pageSize;
         set => _pageSize = value > MaxPageSize ? MaxPageSize : value;
-    }
-
-    internal DateTime TimeStamp = DateTime.UtcNow;
-
-    public long TimeStampTicks
-    {
-        get => TimeStamp.Ticks;
-        set => TimeStamp = new DateTime(value, DateTimeKind.Utc);
     }
 }

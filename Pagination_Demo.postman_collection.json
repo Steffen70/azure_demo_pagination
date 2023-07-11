@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "GetWeather",
+			"name": "Paginated/DemoSelect",
 			"event": [
 				{
 					"listen": "test",
@@ -34,7 +34,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"pageSize\": 3\r\n}",
+					"raw": "{\r\n    \"pageSize\": 10,\r\n    \"currentPage\": 3,\r\n    \"customFilter\": \"test\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -42,21 +42,22 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:7269/weatherforecast",
+					"raw": "https://localhost:7269/Paginated/DemoSelect",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
 					"port": "7269",
 					"path": [
-						"weatherforecast"
+						"Paginated",
+						"DemoSelect"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "GetWeather/test-filter",
+			"name": "Paginated/sql-query-identifier/DemoSelect",
 			"event": [
 				{
 					"listen": "test",
@@ -83,7 +84,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"pageSize\": 1,\r\n    \"currentPage\": 1,\r\n    \"date\": \"2023-06-30\"\r\n}",
+					"raw": "{\r\n    \"pageSize\": 10,\r\n    \"currentPage\": 3,\r\n    \"customFilter\": \"test\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -91,65 +92,15 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:7269/weatherforecast/test-filter",
+					"raw": "https://localhost:7269/Paginated/DemoSelect",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
 					"port": "7269",
 					"path": [
-						"weatherforecast",
-						"test-filter"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetWeather/sqlite",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "",
-						"type": "text",
-						"disabled": true
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"pageSize\": 1,\r\n    \"currentPage\": 1,\r\n    \"date\": \"2023-06-30\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://localhost:7269/weatherforecast/sqlite",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "7269",
-					"path": [
-						"weatherforecast",
-						"sqlite"
+						"Paginated",
+						"DemoSelect"
 					]
 				}
 			},
