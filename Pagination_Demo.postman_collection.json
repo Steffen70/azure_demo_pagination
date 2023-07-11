@@ -63,15 +63,14 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							""
+							"var resStr = pm.response.text();\r",
+							"\r",
+							"pm.collectionVariables.set(\"sql_query_identifier\", resStr);"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"method": "GET",
 				"header": [
@@ -82,17 +81,8 @@
 						"disabled": true
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"pageSize\": 10,\r\n    \"currentPage\": 3,\r\n    \"customFilter\": \"test\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "https://localhost:7269/Paginated/DemoSelect",
+					"raw": "https://localhost:7269/Paginated/sql-query-identifier/DemoSelect",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -100,11 +90,78 @@
 					"port": "7269",
 					"path": [
 						"Paginated",
+						"sql-query-identifier",
 						"DemoSelect"
 					]
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Paginated/assembly-bytes/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:7269/Paginated/assembly-bytes/{{sql_query_identifier}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7269",
+					"path": [
+						"Paginated",
+						"assembly-bytes",
+						"{{sql_query_identifier}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "sql_query_identifier",
+			"value": "",
+			"type": "string"
 		}
 	]
 }

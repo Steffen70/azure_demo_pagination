@@ -1,26 +1,25 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace SPPaginationDemo.ModelGenerator;
 
 public class DynamicTypeGenerator
 {
-    public Type Model { get; set; }
+    public Type Model { get; private set; }
+    public byte[] AssemblyBytes { get; private set; }
 
     public static string SqlQueryToIdentifier(string sqlQuery)
     {
-        using var md5 = MD5.Create();
-        var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(sqlQuery));
-        var sb = new StringBuilder();
-        foreach (var b in hash)
-        {
-            sb.Append(b.ToString("X2"));
-        }
-        return sb.ToString();
+        var hash = MD5.HashData(Encoding.UTF8.GetBytes(sqlQuery));
+
+        var hexString = string.Concat(hash.Select(b => b.ToString("X2")));
+
+        return hexString;
     }
 
     public DynamicTypeGenerator(string sqlQuery, Type interfaceType, string connectionString)
@@ -28,63 +27,54 @@ public class DynamicTypeGenerator
         var columns = AnalyzeQuery(sqlQuery, connectionString);
         var typeName = $"DynamicType_{Guid.NewGuid():N}";
 
-        var assemblyName = new AssemblyName(typeName);
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule(typeName);
+        var template = File.ReadAllText("dynamic_type_template.txt");
 
-        var typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Public | TypeAttributes.Class);
-        typeBuilder.AddInterfaceImplementation(interfaceType);
-
-        // Define the get and set methods for the property
-        const MethodAttributes getSetAttr = MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual;
-
-        foreach (var (propertyName, propertyType) in columns)
+        var properties = string.Join(Environment.NewLine, columns.Select(column =>
         {
-            var nullableType = propertyType.IsValueType ? typeof(Nullable<>).MakeGenericType(propertyType) : propertyType;
+            var (propertyName, propertyType) = column;
+            var nullableType = propertyType.IsValueType ? $"Nullable<{propertyType.Name}>" : propertyType.Name;
+            return $"public {nullableType} {propertyName} {{ get; set; }}";
+        }));
 
-            // Define the fieldBuilder builder
-            var fieldBuilder = typeBuilder.DefineField(propertyName, nullableType, FieldAttributes.Private);
+        var code = template
+            .Replace("[[Namespace]]", interfaceType.Namespace)
+            .Replace("[[TypeName]]", typeName)
+            .Replace("[[InterfaceName]]", interfaceType.Name)
+            .Replace("[[Properties]]", properties);
 
-            // Define the get method for the property
-            var getter = typeBuilder.DefineMethod("get_" + propertyName, getSetAttr, nullableType, Type.EmptyTypes);
-            var getterIl = getter.GetILGenerator();
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-            // Load 'this' onto the stack (the instance of the generated type)
-            getterIl.Emit(OpCodes.Ldarg_0);
+        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
 
-            // Emit the default value for the property type
-            getterIl.Emit(OpCodes.Ldfld, fieldBuilder);
+        var references = new List<MetadataReference>
+        {
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Private.CoreLib.dll")),
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
+            MetadataReference.CreateFromFile(interfaceType.Assembly.Location)
+        };
 
-            // Return the value on the stack
-            getterIl.Emit(OpCodes.Ret);
+        var assemblyName = Path.GetRandomFileName();
+        var compilation = CSharpCompilation.Create(
+            assemblyName,
+            syntaxTrees: new[] { syntaxTree },
+            references: references,
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-            // Define the set method for the property
-            var setter = typeBuilder.DefineMethod("set_" + propertyName, getSetAttr, null, new[] { nullableType });
-            var setterIl = setter.GetILGenerator();
+        using var ms = new MemoryStream();
+        var result = compilation.Emit(ms);
 
-            // Load 'this' onto the stack (the instance of the generated type)
-            setterIl.Emit(OpCodes.Ldarg_0);
+        //TODO: Add error handling when compilation fails
+        if (!result.Success)
+            throw new Exception("Compilation failed");
 
-            // Load the property value onto the stack
-            setterIl.Emit(OpCodes.Ldarg_1);
+        ms.Seek(0, SeekOrigin.Begin);
+        AssemblyBytes = ms.ToArray();
 
-            // Store the value in the property field
-            setterIl.Emit(OpCodes.Stfld, fieldBuilder);
-
-            // Return
-            setterIl.Emit(OpCodes.Ret);
-
-            // Define the property builder
-            var propertyBuilder = typeBuilder.DefineProperty(propertyName, PropertyAttributes.HasDefault, nullableType, null);
-
-            // Assign the getter and setter methods to the property builder
-            propertyBuilder.SetGetMethod(getter);
-            propertyBuilder.SetSetMethod(setter);
-        }
-        Model = typeBuilder.CreateType();
+        var assembly = Assembly.Load(AssemblyBytes);
+        Model = assembly.GetTypes().First(t => t.Name == typeName);
     }
 
-    private static List<(string ColumnName, Type DataType)> AnalyzeQuery(string sqlQuery, string connectionString)
+    private static IEnumerable<(string ColumnName, Type DataType)> AnalyzeQuery(string sqlQuery, string connectionString)
     {
         using var connection = new SqlConnection(connectionString);
 

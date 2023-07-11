@@ -53,6 +53,19 @@ public abstract class Sp7ControllerBase : Controller
         return Ok(sqlIdentifier);
     }
 
+    [HttpGet("assembly-bytes/{sqlIdentifier}")]
+    public ActionResult<byte[]> GetAssemblyBytes(string sqlIdentifier)
+    {
+        if (!DynamicTypeGenerators.ContainsKey(sqlIdentifier))
+            return BadRequest();
+
+        var dynamicTypeGenerator = DynamicTypeGenerators[sqlIdentifier];
+
+        var assemblyBytes = dynamicTypeGenerator.AssemblyBytes;
+
+        return Ok(assemblyBytes);
+    }
+
     [Route("{*actionName}")]
     public async Task<IActionResult> HandleRequestAsync(string actionName)
     {
