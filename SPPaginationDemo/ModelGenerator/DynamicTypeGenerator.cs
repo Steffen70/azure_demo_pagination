@@ -5,13 +5,14 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Basic.Reference.Assemblies;
 
 namespace SPPaginationDemo.ModelGenerator;
 
 public class DynamicTypeGenerator
 {
     public Type Model { get; private set; }
-    public byte[] AssemblyBytes { get; private set; }
+    public string AssemblyString { get; private set; }
 
     public static string SqlQueryToIdentifier(string sqlQuery)
     {
@@ -25,7 +26,7 @@ public class DynamicTypeGenerator
     public DynamicTypeGenerator(string sqlQuery, Type interfaceType, string connectionString)
     {
         var columns = AnalyzeQuery(sqlQuery, connectionString);
-        var typeName = $"DynamicType_{Guid.NewGuid():N}";
+        var typeName = $"DynamicType_{SqlQueryToIdentifier(sqlQuery)}";
 
         var template = File.ReadAllText("dynamic_type_template.txt");
 
@@ -44,21 +45,16 @@ public class DynamicTypeGenerator
 
         var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
-
-        var references = new List<MetadataReference>
-        {
-            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Private.CoreLib.dll")),
-            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
-            MetadataReference.CreateFromFile(interfaceType.Assembly.Location)
-        };
+        var references = 
+            new[] {Net70.References.SystemRuntime, Net70.References.SystemCore, MetadataReference.CreateFromFile(interfaceType.Assembly.Location) };
 
         var assemblyName = Path.GetRandomFileName();
         var compilation = CSharpCompilation.Create(
             assemblyName,
             syntaxTrees: new[] { syntaxTree },
             references: references,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithPlatform(Platform.X64));
 
         using var ms = new MemoryStream();
         var result = compilation.Emit(ms);
@@ -68,9 +64,12 @@ public class DynamicTypeGenerator
             throw new Exception("Compilation failed");
 
         ms.Seek(0, SeekOrigin.Begin);
-        AssemblyBytes = ms.ToArray();
+        var assemblyBytes = ms.ToArray();
 
-        var assembly = Assembly.Load(AssemblyBytes);
+        AssemblyString = Convert.ToBase64String(assemblyBytes);
+
+        var assembly = Assembly.Load(assemblyBytes);
+
         Model = assembly.GetTypes().First(t => t.Name == typeName);
     }
 

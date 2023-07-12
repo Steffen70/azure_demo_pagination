@@ -3,7 +3,6 @@ using AutoMapper.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SPPaginationDemo.Filtration;
-using SPPaginationDemo.Filtration.Custom;
 using SPPaginationDemo.ModelGenerator;
 using System.Reflection;
 
@@ -54,14 +53,14 @@ public abstract class Sp7ControllerBase : Controller
     }
 
     [HttpGet("assembly-bytes/{sqlIdentifier}")]
-    public ActionResult<byte[]> GetAssemblyBytes(string sqlIdentifier)
+    public ActionResult<string> GetAssemblyBytes(string sqlIdentifier)
     {
         if (!DynamicTypeGenerators.ContainsKey(sqlIdentifier))
             return BadRequest();
 
         var dynamicTypeGenerator = DynamicTypeGenerators[sqlIdentifier];
 
-        var assemblyBytes = dynamicTypeGenerator.AssemblyBytes;
+        var assemblyBytes = dynamicTypeGenerator.AssemblyString;
 
         return Ok(assemblyBytes);
     }

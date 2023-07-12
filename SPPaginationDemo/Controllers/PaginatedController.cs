@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SPPaginationDemo.Filtration;
 using SPPaginationDemo.Filtration.Custom;
 using SPPaginationDemo.ModelGenerator;
 

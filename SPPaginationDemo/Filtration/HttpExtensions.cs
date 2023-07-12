@@ -1,12 +1,10 @@
-using Microsoft.Extensions.Options;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace SPPaginationDemo.Filtration;
 
 public static class HttpExtensions
 {
-    private static readonly JsonSerializerOptions Options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    public static readonly JsonSerializerOptions Options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     public static async Task<TParams?> GetFiltrationParamsAsync<TParams>(this HttpContext httpContext) where TParams : FiltrationParams
     {

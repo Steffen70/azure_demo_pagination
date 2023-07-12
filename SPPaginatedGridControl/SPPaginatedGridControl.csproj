@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>False</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="DevExpress.Win.Design" Version="21.2.7" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
   </ItemGroup>
 
   <ItemGroup>
