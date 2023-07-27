@@ -135,6 +135,37 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "live-update/DemoUpdate/DemoCallback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Name\": \"World!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7269/live-update/callback/DemoUpdate/DemoCallback",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7269",
+					"path": [
+						"live-update",
+						"callback",
+						"DemoUpdate",
+						"DemoCallback"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [

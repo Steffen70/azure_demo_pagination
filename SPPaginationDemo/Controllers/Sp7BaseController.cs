@@ -41,7 +41,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var sqlQuery = await endpoint.SqlQuery;
 
-        var sqlIdentifier = DynamicTypeGenerator.SqlQueryToIdentifier(sqlQuery);
+        var sqlIdentifier = DynamicTypeGenerator.GetIdentifier(sqlQuery);
 
         if (DynamicTypeGenerators.ContainsKey(sqlIdentifier))
             return Ok(sqlIdentifier);
@@ -77,7 +77,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var demoSelect = await endpoint.SqlQuery;
 
-        var sqlIdentifier = DynamicTypeGenerator.SqlQueryToIdentifier(demoSelect);
+        var sqlIdentifier = DynamicTypeGenerator.GetIdentifier(demoSelect);
 
         var endpointType = endpoint.GetType();
 

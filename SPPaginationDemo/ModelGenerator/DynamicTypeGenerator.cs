@@ -14,7 +14,7 @@ public class DynamicTypeGenerator
     public Type Model { get; private set; }
     public string AssemblyString { get; private set; }
 
-    public static string SqlQueryToIdentifier(string sqlQuery)
+    public static string GetIdentifier(string sqlQuery)
     {
         var hash = MD5.HashData(Encoding.UTF8.GetBytes(sqlQuery));
 
@@ -26,7 +26,7 @@ public class DynamicTypeGenerator
     public DynamicTypeGenerator(string sqlQuery, Type interfaceType, string connectionString)
     {
         var columns = AnalyzeQuery(sqlQuery, connectionString);
-        var typeName = $"DynamicType_{SqlQueryToIdentifier(sqlQuery)}";
+        var typeName = $"DynamicType_{GetIdentifier(sqlQuery)}";
 
         var template = File.ReadAllText("dynamic_type_template.txt");
 
