@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SPUpdateFramework\SPUpdateFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="demo_sql_abfrage.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -46,4 +51,13 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="DevExpress.XtraEditors.v21.2">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\DevExpress 21.2\Components\Offline Packages\devexpress.win.navigation\21.2.7\lib\netcoreapp3.0\DevExpress.XtraEditors.v21.2.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UpdateAsseblies\" />
+  </ItemGroup>
 </Project>

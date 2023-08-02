@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
-using SPPaginationDemo.Extensions;
+using SPUpdateFramework.Extensions;
 
 var httpClient = new HttpClient
 {

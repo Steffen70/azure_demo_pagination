@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Security.Cryptography;
 
-namespace SPPaginationDemo.Extensions;
+namespace SPUpdateFramework.Extensions;
 
 public static class ByteArrayExtension
 {

@@ -66,4 +66,7 @@ appsettings*.secrets.json
 publish/
 
 # Custom files/directories
+/SPPaginationDemo/UpdateAsseblies/*
+
 # Add any custom file extensions or directories that you want to ignore
+

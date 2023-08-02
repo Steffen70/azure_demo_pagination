@@ -166,6 +166,27 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "live-update/get-public-key/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7269/live-update/get-public-key/",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7269",
+					"path": [
+						"live-update",
+						"get-public-key",
+						""
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [

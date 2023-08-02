@@ -4,8 +4,8 @@ using System.Reflection;
 using static SPPaginationDemo.ModelGenerator.DynamicTypeGenerator;
 using System.Security.Cryptography;
 using System.Text;
-using SPPaginationDemo.Extensions;
-using SPPaginationDemo.Model;
+using SPUpdateFramework;
+using SPUpdateFramework.Extensions;
 
 namespace SPPaginationDemo.Controllers;
 
@@ -44,7 +44,14 @@ public class LiveUpdateController : Controller
         if ((registration.Callbacks.FirstOrDefault(c => c.Key == callback).Value ?? Activator.CreateInstance(callbackType)) is not IEndpointCallback callbackInstance)
             return NotFound();
 
-        registration.Callbacks.Add(callback, callbackInstance);
+        try
+        {
+            registration.Callbacks.Add(callback, callbackInstance);
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
 
         var callbackTask = new Task<ActionResult>(() => callbackInstance.OnEndpointCallback(json));
 
@@ -87,6 +94,8 @@ public class LiveUpdateController : Controller
         var assemblyName = assembly.GetName().Name!;
 
         System.IO.File.Move(Path.Combine(AssembliesFolder, $"assembly_{guid}.dll"), Path.Combine(AssembliesFolder, $"{assemblyName}.dll"));
+
+        System.IO.File.Delete(Path.Combine(AssembliesFolder, $"assembly_{guid}.dll"));
 
         UpdateAssemblies.Add(new AssemblyRegistration { Assembly = assembly, AssemblyName = assemblyName, Identifier = identifier });
 
