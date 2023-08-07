@@ -1,11 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
+
+    <IsServerBuild>false</IsServerBuild>
   </PropertyGroup>
+
+  <Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent">
+    <Exec Command="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\SP6LogicDemoBlueprint.exe SP6LogicDemo" />
+  </Target>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
@@ -13,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SPUpdateFramework\SPUpdateFramework.csproj" />
+    <ProjectReference Include="..\SP6LogicDemo\SP6LogicDemo.csproj"/>
+    <ProjectReference Include="..\SP6LogicDemoBlueprint\SP6LogicDemoBlueprint.csproj" ReferenceOutputAssembly="false" Private="false"/>
   </ItemGroup>
 
   <ItemGroup>

@@ -31,20 +31,22 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             rcMainRibbon = new DevExpress.XtraBars.Ribbon.RibbonControl();
             bbiUpload = new DevExpress.XtraBars.BarButtonItem();
+            bbiTestEndpoint = new DevExpress.XtraBars.BarButtonItem();
             rpDynamicConstruction = new DevExpress.XtraBars.Ribbon.RibbonPage();
             rpgDynamicConstruction = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             rpLiveUpdate = new DevExpress.XtraBars.Ribbon.RibbonPage();
             rpgUpdateGroup = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             pContent = new Panel();
+            bbiRunServerside = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)rcMainRibbon).BeginInit();
             SuspendLayout();
             // 
             // rcMainRibbon
             // 
             rcMainRibbon.ExpandCollapseItem.Id = 0;
-            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload });
+            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiRunServerside });
             rcMainRibbon.Location = new Point(0, 0);
-            rcMainRibbon.MaxItemId = 2;
+            rcMainRibbon.MaxItemId = 4;
             rcMainRibbon.Name = "rcMainRibbon";
             rcMainRibbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { rpDynamicConstruction, rpLiveUpdate });
             rcMainRibbon.ShowApplicationButton = DevExpress.Utils.DefaultBoolean.False;
@@ -63,6 +65,15 @@
             bbiUpload.Name = "bbiUpload";
             bbiUpload.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             // 
+            // bbiTestEndpoint
+            // 
+            bbiTestEndpoint.Caption = "Test Endpoint";
+            bbiTestEndpoint.Id = 2;
+            bbiTestEndpoint.ImageOptions.Image = (Image)resources.GetObject("bbiTestEndpoint.ImageOptions.Image");
+            bbiTestEndpoint.Name = "bbiTestEndpoint";
+            bbiTestEndpoint.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
+            bbiTestEndpoint.ItemClick += OnItemClick_bbiTestEndpoint;
+            // 
             // rpDynamicConstruction
             // 
             rpDynamicConstruction.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] { rpgDynamicConstruction });
@@ -71,6 +82,8 @@
             // 
             // rpgDynamicConstruction
             // 
+            rpgDynamicConstruction.ItemLinks.Add(bbiTestEndpoint);
+            rpgDynamicConstruction.ItemLinks.Add(bbiRunServerside);
             rpgDynamicConstruction.Name = "rpgDynamicConstruction";
             // 
             // rpLiveUpdate
@@ -91,6 +104,15 @@
             pContent.Name = "pContent";
             pContent.Size = new Size(1091, 406);
             pContent.TabIndex = 1;
+            // 
+            // bbiRunServerside
+            // 
+            bbiRunServerside.Caption = "Run Serverside";
+            bbiRunServerside.Id = 3;
+            bbiRunServerside.ImageOptions.Image = (Image)resources.GetObject("barButtonItem1.ImageOptions.Image");
+            bbiRunServerside.Name = "bbiRunServerside";
+            bbiRunServerside.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
+            bbiRunServerside.ItemClick += OnItemClick_bbiRunServerside;
             // 
             // MainForm
             // 
@@ -118,5 +140,7 @@
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgUpdateGroup;
         private Panel pContent;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgDynamicConstruction;
+        private DevExpress.XtraBars.BarButtonItem bbiTestEndpoint;
+        private DevExpress.XtraBars.BarButtonItem bbiRunServerside;
     }
 }

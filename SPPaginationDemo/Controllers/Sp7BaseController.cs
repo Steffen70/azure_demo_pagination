@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SPPaginationDemo.Filtration;
 using SPPaginationDemo.ModelGenerator;
 using System.Reflection;
+#pragma warning disable CS1998
 
 namespace SPPaginationDemo.Controllers;
 

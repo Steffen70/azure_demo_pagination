@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -14,7 +16,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DemoUpdate\DemoUpdate.csproj" ReferenceOutputAssembly="flase" />
     <ProjectReference Include="..\SPPaginationDemo\SPPaginationDemo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DemoUpdate">
+      <HintPath>..\DemoUpdate\bin\Release\net7.0-windows\DemoUpdate.dll</HintPath>
+    </Reference>
+
+    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Debug'">
+      <HintPath>..\SP6LogicDemo\bin\Debug\net7.0-windows\SP6LogicDemo.dll</HintPath>
+    </Reference>
+
+    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Release'">
+      <HintPath>..\SP6LogicDemoBlueprint\bin\Release\net7.0-windows\Blueprint_SP6LogicDemo.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

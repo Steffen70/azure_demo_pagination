@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SPPaginationDemo.Filtration.Custom;
 using SPPaginationDemo.ModelGenerator;
+#pragma warning disable CS1998
 
 namespace SPPaginationDemo.Controllers;
 

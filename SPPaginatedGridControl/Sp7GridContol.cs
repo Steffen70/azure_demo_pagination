@@ -6,7 +6,10 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using Newtonsoft.Json;
 using SPPaginationDemo.Filtration;
+using SPUpdateFramework.Extensions;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+// ReSharper disable RedundantCatchClause
+#pragma warning disable CS0168
 
 namespace SPPaginatedGridControl;
 
@@ -107,9 +110,9 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
             // Get the assembly bytes from the REST API
             var assemblyString = (await _client.GetStringAsync($"/Paginated/assembly-bytes/{_queryIdentifier}")).Replace("\"", "");
 
-            var assemblyBytes = Convert.FromBase64String(assemblyString);
+            var assemblyBytes = Convert.FromBase64String(assemblyString).Decompress();
 
-            await File.WriteAllBytesAsync("assembly_clientside.dll", assemblyBytes);
+            //await File.WriteAllBytesAsync("assembly_clientside.dll", assemblyBytes);
 
             // Load the assembly and get the type
             var assembly = Assembly.Load(assemblyBytes);
@@ -137,7 +140,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
             // ReSharper disable once MethodHasAsyncOverload
             ViewTopRowChanged(this, EventArgs.Empty);
         }
-        catch (Exception e)
+        catch (Exception _)
         {
             //TODO: Handle exception when the REST API is not available or _modelType is not set
             throw;
@@ -181,7 +184,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
 
             return (FiltrationHeader?.CurrentPage ?? 1) == FiltrationHeader?.TotalPages;
         }
-        catch (Exception ex)
+        catch (Exception _)
         {
             //TODO: Handle exception when fetching data from the REST API fails
             return false;

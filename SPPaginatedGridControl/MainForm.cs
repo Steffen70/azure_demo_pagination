@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using DemoUpdate;
 using DevExpress.XtraBars;
 using DevExpress.XtraBars.Ribbon;
 using DevExpress.XtraEditors;
@@ -10,15 +11,17 @@ using SPPaginationDemo.Filtration.Custom;
 using DevExpress.XtraGrid.Views.Grid;
 using SPUpdateFramework;
 using SPUpdateFramework.Extensions;
+using DevExpress.CodeParser;
 
 namespace SPPaginatedGridControl;
 
-public partial class MainForm : DevExpress.XtraBars.Ribbon.RibbonForm
+public partial class MainForm : RibbonForm
 {
     private readonly Sp7GridControl<CustomFiltrationParams, FiltrationHeader> _gridControl;
 
     public MainForm()
     {
+
         InitializeComponent();
 
         // Create an instance of the custom grid control
@@ -50,7 +53,7 @@ public partial class MainForm : DevExpress.XtraBars.Ribbon.RibbonForm
         gridView.OptionsView.ShowGroupPanel = false;
     }
 
-    private async Task OnItemClick_bbiUpload(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+    private async Task OnItemClick_bbiUpload(object sender, ItemClickEventArgs e)
     {
         var dialog = new OpenFileDialog
         {
@@ -63,36 +66,6 @@ public partial class MainForm : DevExpress.XtraBars.Ribbon.RibbonForm
         var assemblyPath = new FileInfo(dialog.FileName);
 
         var assemblyBytes = await File.ReadAllBytesAsync(assemblyPath.FullName);
-
-        // Load the assembly into current AppDomain
-        var assembly = Assembly.Load(assemblyBytes);
-
-        var ribbonFunctionTypes = assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IRibbonFunction))).ToList();
-        var ribbonFunctions = ribbonFunctionTypes.Select(t => (IRibbonFunction)Activator.CreateInstance(t)!).ToList();
-
-        if (ribbonFunctions.Any())
-        {
-            foreach (var ribbonFunction in ribbonFunctions)
-            {
-                var barButtonItem = new BarButtonItem
-                {
-                    Caption = ribbonFunction.Name,
-                    ImageOptions =
-                    {
-                        Image = Image.FromStream(new MemoryStream(Convert.FromBase64String(ribbonFunction.Image)))
-                    },
-                    RibbonStyle = RibbonItemStyles.Large,
-                };
-
-                barButtonItem.ItemClick += (s, e) =>
-                {
-                    var clickTask = new Task(() => ribbonFunction.OnClick(s, e));
-                    clickTask.Start();
-                };
-
-                rpgDynamicConstruction.ItemLinks.Add(barButtonItem);
-            };
-        }
 
         // Upload the assembly to the server
         var httpClient = new HttpClient
@@ -122,5 +95,28 @@ public partial class MainForm : DevExpress.XtraBars.Ribbon.RibbonForm
         var assemblyName = await response.Content.ReadAsStringAsync();
 
         XtraMessageBox.Show($"Successfully uploaded update: {assemblyName}");
+    }
+
+
+#pragma warning disable CS4014
+    private void OnItemClick_bbiTestEndpoint(object sender, ItemClickEventArgs e) => CallEndpoint(false);
+
+    private void OnItemClick_bbiRunServerside(object sender, ItemClickEventArgs e) => CallEndpoint(true);
+#pragma warning restore CS4014
+
+    private static async Task CallEndpoint(bool runServerside)
+    {
+        //TODO: Create HTTP Client to abstract Signal R responses to avoid timeouts
+
+        var dto = new DemoDto
+        {
+            Name = "World"
+        };
+
+        var client = new Sp7WebClient();
+
+        var stringResult = await client.CallEnpointAsync<DemoCallback, DemoDto>(dto, runServerside);
+
+        XtraMessageBox.Show(stringResult);
     }
 }

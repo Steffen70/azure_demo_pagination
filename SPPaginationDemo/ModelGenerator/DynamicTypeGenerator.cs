@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Basic.Reference.Assemblies;
+using SPUpdateFramework.Extensions;
 
 namespace SPPaginationDemo.ModelGenerator;
 
@@ -66,7 +67,7 @@ public class DynamicTypeGenerator
         ms.Seek(0, SeekOrigin.Begin);
         var assemblyBytes = ms.ToArray();
 
-        AssemblyString = Convert.ToBase64String(assemblyBytes);
+        AssemblyString = Convert.ToBase64String(assemblyBytes.Compress());
 
         var assembly = Assembly.Load(assemblyBytes);
 

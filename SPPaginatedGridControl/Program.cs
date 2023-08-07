@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace SPPaginatedGridControl;
 
 internal static class Program
@@ -8,6 +10,15 @@ internal static class Program
     [STAThread]
     static void Main()
     {
+
+#if RELEASE
+        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+        {
+            var name = args.Name.Split(',').First();
+            return name == "SP6LogicDemo" ? Assembly.LoadFrom($"Blueprint_{name}.dll") : null;
+        };
+#endif
+
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm());
     }
