@@ -36,7 +36,7 @@ public class LogicController : Controller
     }
 
     private static readonly List<Type> CachedTypes = new();
-    private Type GetType(string typeName)
+    private static Type GetType(string typeName)
     {
         var type = CachedTypes.FirstOrDefault(c => c.FullName == typeName);
 

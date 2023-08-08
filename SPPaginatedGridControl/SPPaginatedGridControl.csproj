@@ -16,7 +16,51 @@
   </Target>
 
   <Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' == 'Release'">
-  <!--<Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent">-->
+    <Exec Command="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\SP6LogicDemoBlueprint.exe SP6LogicDemo" />
+
+    <Copy SourceFiles="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\Blueprint_SP6LogicDemo.dll"
+          DestinationFiles="$(OutputPath)\SP6LogicDemo.dll" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Win.Design" Version="21.2.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SPPaginationDemo\SPPaginationDemo.csproj" />
+    <ProjectReference Include="..\SP6LogicDemoBlueprint\SP6LogicDemoBlueprint.csproj" ReferenceOutputAssembly="false" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Debug'">
+      <HintPath>..\SP6LogicDemo\bin\$(Configuration)\net7.0-windows\SP6LogicDemo.dll</HintPath>
+    </Reference>
+
+    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Release'">
+      <HintPath>$(OutputPath)\SP6LogicDemo.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
+
+<!--<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>False</UseWPF>
+  </PropertyGroup>
+
+  <Target Name="ForceClean" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutDir)" />
+  </Target>
+
+  <Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent">
     <Exec Command="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\SP6LogicDemoBlueprint.exe SP6LogicDemo" />
 
     <Copy SourceFiles="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\Blueprint_SP6LogicDemo.dll"
@@ -37,14 +81,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Debug'">
-      <HintPath>..\SP6LogicDemo\bin\$(Configuration)\net7.0-windows\SP6LogicDemo.dll</HintPath>
-    </Reference>
-
-    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Release'">
-    <!--<Reference Include="SP6LogicDemo">-->
+    <Reference Include="SP6LogicDemo">
       <HintPath>$(OutputPath)\SP6LogicDemo.dll</HintPath>
     </Reference>
   </ItemGroup>
 
-</Project>
+</Project>-->
