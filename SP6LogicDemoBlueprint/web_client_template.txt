@@ -1,0 +1,24 @@
+﻿public class Sp7WebClient
+{
+    private static HttpClient? _client;
+
+    public static HttpClient I
+    {
+        get
+        {
+            if (_client != null) return _client;
+
+            _client = new HttpClient
+            {
+                BaseAddress = new Uri("https://localhost:7269/")
+            };
+
+            // Add default headers as necessary
+            _client.DefaultRequestHeaders.Accept.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _client.DefaultRequestHeaders.Add("User-Agent", "Sp7DemoUpdate");
+
+            return _client;
+        }
+    }
+}

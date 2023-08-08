@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,6 +9,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <Target Name="ForceClean" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutDir)" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Basic.Reference.Assemblies.Net70" Version="1.4.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
@@ -16,7 +20,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SP6LogicDemo\SP6LogicDemo.csproj" />
-    <ProjectReference Include="..\SPUpdateFramework\SPUpdateFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="method_body_template.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="web_client_template.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

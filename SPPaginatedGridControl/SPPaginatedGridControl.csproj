@@ -11,26 +11,39 @@
     <UseWPF>False</UseWPF>
   </PropertyGroup>
 
+  <Target Name="ForceClean" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutDir)" />
+  </Target>
+
+  <Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' == 'Release'">
+  <!--<Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent">-->
+    <Exec Command="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\SP6LogicDemoBlueprint.exe SP6LogicDemo" />
+
+    <Copy SourceFiles="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\Blueprint_SP6LogicDemo.dll"
+          DestinationFiles="$(OutputPath)\SP6LogicDemo.dll" />
+
+    <Copy SourceFiles="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\Blueprint_SP6LogicDemo.pdb"
+          DestinationFiles="$(OutputPath)\SP6LogicDemo.pdb"
+          Condition="'$(Configuration)' == 'Debug'" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="DevExpress.Win.Design" Version="21.2.7" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DemoUpdate\DemoUpdate.csproj" ReferenceOutputAssembly="flase" />
     <ProjectReference Include="..\SPPaginationDemo\SPPaginationDemo.csproj" />
+    <ProjectReference Include="..\SP6LogicDemoBlueprint\SP6LogicDemoBlueprint.csproj" ReferenceOutputAssembly="false" Private="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DemoUpdate">
-      <HintPath>..\DemoUpdate\bin\Release\net7.0-windows\DemoUpdate.dll</HintPath>
-    </Reference>
-
     <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Debug'">
-      <HintPath>..\SP6LogicDemo\bin\Debug\net7.0-windows\SP6LogicDemo.dll</HintPath>
+      <HintPath>..\SP6LogicDemo\bin\$(Configuration)\net7.0-windows\SP6LogicDemo.dll</HintPath>
     </Reference>
 
     <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Release'">
-      <HintPath>..\SP6LogicDemoBlueprint\bin\Release\net7.0-windows\Blueprint_SP6LogicDemo.dll</HintPath>
+    <!--<Reference Include="SP6LogicDemo">-->
+      <HintPath>$(OutputPath)\SP6LogicDemo.dll</HintPath>
     </Reference>
   </ItemGroup>
 

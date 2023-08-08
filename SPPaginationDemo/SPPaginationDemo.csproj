@@ -9,6 +9,10 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+  <Target Name="ForceClean" AfterTargets="Clean">
+    <RemoveDir Directories="$(OutDir)" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="ADO.Net.Client.Core" Version="1.4.5" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
@@ -35,9 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DemoUpdate\DemoUpdate.csproj" ReferenceOutputAssembly="flase" />
-    <ProjectReference Include="..\SP6LogicDemo\SP6LogicDemo.csproj" PrivateAssets="all"/>
-    <ProjectReference Include="..\SPUpdateFramework\SPUpdateFramework.csproj" />
+    <ProjectReference Include="..\SP6LogicDemo\SP6LogicDemo.csproj" ReferenceOutputAssembly="false" Private="false" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,9 +61,15 @@
     <Reference Include="DevExpress.XtraEditors.v21.2">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\DevExpress 21.2\Components\Offline Packages\devexpress.win.navigation\21.2.7\lib\netcoreapp3.0\DevExpress.XtraEditors.v21.2.dll</HintPath>
     </Reference>
+
+    <Reference Include="SP6LogicDemo">
+      <HintPath>..\SP6LogicDemo\bin\$(Configuration)\net7.0-windows\SP6LogicDemo.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="UpdateAsseblies\" />
   </ItemGroup>
+
 </Project>

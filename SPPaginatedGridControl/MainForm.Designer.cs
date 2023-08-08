@@ -37,14 +37,13 @@
             rpLiveUpdate = new DevExpress.XtraBars.Ribbon.RibbonPage();
             rpgUpdateGroup = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             pContent = new Panel();
-            bbiRunServerside = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)rcMainRibbon).BeginInit();
             SuspendLayout();
             // 
             // rcMainRibbon
             // 
             rcMainRibbon.ExpandCollapseItem.Id = 0;
-            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiRunServerside });
+            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint });
             rcMainRibbon.Location = new Point(0, 0);
             rcMainRibbon.MaxItemId = 4;
             rcMainRibbon.Name = "rcMainRibbon";
@@ -83,7 +82,6 @@
             // rpgDynamicConstruction
             // 
             rpgDynamicConstruction.ItemLinks.Add(bbiTestEndpoint);
-            rpgDynamicConstruction.ItemLinks.Add(bbiRunServerside);
             rpgDynamicConstruction.Name = "rpgDynamicConstruction";
             // 
             // rpLiveUpdate
@@ -104,15 +102,6 @@
             pContent.Name = "pContent";
             pContent.Size = new Size(1091, 406);
             pContent.TabIndex = 1;
-            // 
-            // bbiRunServerside
-            // 
-            bbiRunServerside.Caption = "Run Serverside";
-            bbiRunServerside.Id = 3;
-            bbiRunServerside.ImageOptions.Image = (Image)resources.GetObject("barButtonItem1.ImageOptions.Image");
-            bbiRunServerside.Name = "bbiRunServerside";
-            bbiRunServerside.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
-            bbiRunServerside.ItemClick += OnItemClick_bbiRunServerside;
             // 
             // MainForm
             // 
@@ -141,6 +130,5 @@
         private Panel pContent;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgDynamicConstruction;
         private DevExpress.XtraBars.BarButtonItem bbiTestEndpoint;
-        private DevExpress.XtraBars.BarButtonItem bbiRunServerside;
     }
 }

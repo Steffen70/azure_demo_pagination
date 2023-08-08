@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Basic.Reference.Assemblies;
-using SPUpdateFramework.Extensions;
+using SPPaginationDemo.Extensions;
 
 namespace SPPaginationDemo.ModelGenerator;
 

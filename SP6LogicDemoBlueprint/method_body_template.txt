@@ -1,0 +1,7 @@
+var json = paramValues.Any() ? JsonSerializer.Serialize(paramValues) : string.Empty;
+
+var response = Sp7WebClient.I.PostAsync("server-call/callback/[typeName]/[methodName]", new StringContent(json, Encoding.UTF8, "application/json")).Result;
+
+if (!response.IsSuccessStatusCode) throw new Exception($"Error calling endpoint: {(int)response.StatusCode} - {response.ReasonPhrase}");
+
+var stringResult = response.Content.ReadAsStringAsync().Result.Replace("\"", "");

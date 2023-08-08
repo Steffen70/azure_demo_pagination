@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-// ReSharper disable UnusedMember.Global
 #pragma warning disable CA1822
 
 namespace SP6LogicDemo;

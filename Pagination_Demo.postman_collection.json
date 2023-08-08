@@ -141,48 +141,18 @@
 			"request": {
 				"method": "POST",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"Name\": \"World!\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "https://localhost:7269/live-update/callback/DemoUpdate/DemoCallback",
+					"raw": "https://localhost:7269/server-call/callback/SP6LogicDemo.Logic/GetProgramName",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
 					"port": "7269",
 					"path": [
-						"live-update",
+						"server-call",
 						"callback",
-						"DemoUpdate",
-						"DemoCallback"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "live-update/get-public-key/",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:7269/live-update/get-public-key/",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "7269",
-					"path": [
-						"live-update",
-						"get-public-key",
-						""
+						"SP6LogicDemo.Logic",
+						"GetProgramName"
 					]
 				}
 			},

@@ -5,8 +5,8 @@ using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using Newtonsoft.Json;
+using SPPaginationDemo.Extensions;
 using SPPaginationDemo.Filtration;
-using SPUpdateFramework.Extensions;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 // ReSharper disable RedundantCatchClause
 #pragma warning disable CS0168

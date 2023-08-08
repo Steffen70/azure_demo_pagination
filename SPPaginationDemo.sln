@@ -7,13 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SPPaginationDemo", "SPPagin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SPPaginatedGridControl", "SPPaginatedGridControl\SPPaginatedGridControl.csproj", "{C7AC09C4-8A56-44F9-9E13-EBEE5005BA2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoUpdate", "DemoUpdate\DemoUpdate.csproj", "{6E062458-251A-4323-8B60-B883C42F290F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SPUpdateFramework", "SPUpdateFramework\SPUpdateFramework.csproj", "{14A87A52-1CA0-453F-A465-2E7841CCD1B2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SP6LogicDemo", "SP6LogicDemo\SP6LogicDemo.csproj", "{7E6A37D1-7729-43D5-9213-309BD74706A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SP6LogicDemoBlueprint", "SP6LogicDemoBlueprint\SP6LogicDemoBlueprint.csproj", "{B75FD97E-2DEE-4260-AF81-D980625E14A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SP6LogicDemoBlueprint", "SP6LogicDemoBlueprint\SP6LogicDemoBlueprint.csproj", "{B75FD97E-2DEE-4260-AF81-D980625E14A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,14 +25,6 @@ Global
 		{C7AC09C4-8A56-44F9-9E13-EBEE5005BA2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7AC09C4-8A56-44F9-9E13-EBEE5005BA2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7AC09C4-8A56-44F9-9E13-EBEE5005BA2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6E062458-251A-4323-8B60-B883C42F290F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E062458-251A-4323-8B60-B883C42F290F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E062458-251A-4323-8B60-B883C42F290F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E062458-251A-4323-8B60-B883C42F290F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{14A87A52-1CA0-453F-A465-2E7841CCD1B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14A87A52-1CA0-453F-A465-2E7841CCD1B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14A87A52-1CA0-453F-A465-2E7841CCD1B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{14A87A52-1CA0-453F-A465-2E7841CCD1B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7E6A37D1-7729-43D5-9213-309BD74706A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7E6A37D1-7729-43D5-9213-309BD74706A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E6A37D1-7729-43D5-9213-309BD74706A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
