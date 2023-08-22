@@ -1,9 +1,8 @@
-﻿using System.Net;
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using Newtonsoft.Json;
-using AutoMapper;
+#pragma warning disable IDE0290
 
 namespace SPPaginationDemo.Controllers;
 

@@ -21,24 +21,27 @@ public partial class MainForm : RibbonForm
     {
         InitializeComponent();
 
+        // Start the stopwatch and create a thread to update the elapsed time
         if (Stopwatch.Elapsed == TimeSpan.Zero)
+        {
             Stopwatch.Start();
 
-        new Thread(() =>
-        {
-            while (true)
+            new Thread(() =>
             {
-                Thread.Sleep(100);
+                while (true)
+                {
+                    Thread.Sleep(100);
 
-                if (Stopwatch.Elapsed == TimeSpan.Zero)
-                    continue;
+                    if (Stopwatch.Elapsed == TimeSpan.Zero)
+                        continue;
 
-                Invoke(() => bsiStopwatchOutput.Caption = $@"Elapsed: {Stopwatch.ElapsedMilliseconds} ms");
+                    Invoke(() => bsiStopwatchOutput.Caption = $@"Elapsed: {Stopwatch.ElapsedMilliseconds} ms");
 
-                if (!Stopwatch.IsRunning)
-                    return;
-            }
-        }).Start();
+                    if (!Stopwatch.IsRunning)
+                        return;
+                }
+            }).Start();
+        }
 
         // Create an instance of the custom grid control
         _gridControl = new Sp7GridControl<CustomFiltrationParams, FiltrationHeader>

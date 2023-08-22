@@ -1,12 +1,9 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Text.Json;
 
 #if DEBUG
 Debugger.Launch();

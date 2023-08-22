@@ -1,8 +1,8 @@
-using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SPPaginationDemo.Filtration.Custom;
 using SPPaginationDemo.ModelGenerator;
+#pragma warning disable IDE0290
 #pragma warning disable CS1998
 
 namespace SPPaginationDemo.Controllers;
@@ -10,7 +10,7 @@ namespace SPPaginationDemo.Controllers;
 
 public class PaginatedController : Sp7ControllerBase
 {
-    public PaginatedController(IMapper mapper, IConfiguration configuration, IWebHostEnvironment env) : base(mapper, configuration, env.ContentRootPath) { }
+    public PaginatedController(IMapper mapper, IConfiguration configuration, IHostEnvironment env) : base(mapper, configuration, env.ContentRootPath) { }
 
     public class DemoSelect : Endpoint<IGeneratedEntity, CustomFiltrationParams>
     {

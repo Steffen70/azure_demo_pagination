@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace SPPaginatedGridControl;
 
 internal static class Program
