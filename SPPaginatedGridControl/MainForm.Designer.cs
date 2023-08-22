@@ -37,17 +37,18 @@
             rpgDynamicConstruction = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             rpAdmin = new DevExpress.XtraBars.Ribbon.RibbonPage();
             rpgUpdateGroup = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
-            pContent = new Panel();
             rpgDevOptions = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            pContent = new Panel();
+            bsiStopwatchOutput = new DevExpress.XtraBars.BarStaticItem();
             ((System.ComponentModel.ISupportInitialize)rcMainRibbon).BeginInit();
             SuspendLayout();
             // 
             // rcMainRibbon
             // 
             rcMainRibbon.ExpandCollapseItem.Id = 0;
-            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiEncryptPassword });
+            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiEncryptPassword, bsiStopwatchOutput });
             rcMainRibbon.Location = new Point(0, 0);
-            rcMainRibbon.MaxItemId = 6;
+            rcMainRibbon.MaxItemId = 7;
             rcMainRibbon.Name = "rcMainRibbon";
             rcMainRibbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { rpMain, rpAdmin });
             rcMainRibbon.ShowApplicationButton = DevExpress.Utils.DefaultBoolean.False;
@@ -94,6 +95,7 @@
             // rpgDynamicConstruction
             // 
             rpgDynamicConstruction.ItemLinks.Add(bbiTestEndpoint);
+            rpgDynamicConstruction.ItemLinks.Add(bsiStopwatchOutput);
             rpgDynamicConstruction.Name = "rpgDynamicConstruction";
             // 
             // rpAdmin
@@ -107,6 +109,11 @@
             rpgUpdateGroup.ItemLinks.Add(bbiUpload);
             rpgUpdateGroup.Name = "rpgUpdateGroup";
             // 
+            // rpgDevOptions
+            // 
+            rpgDevOptions.ItemLinks.Add(bbiEncryptPassword);
+            rpgDevOptions.Name = "rpgDevOptions";
+            // 
             // pContent
             // 
             pContent.Dock = DockStyle.Fill;
@@ -115,10 +122,10 @@
             pContent.Size = new Size(1091, 406);
             pContent.TabIndex = 1;
             // 
-            // rpgDevOptions
+            // bsiStopwatchOutput
             // 
-            rpgDevOptions.ItemLinks.Add(bbiEncryptPassword);
-            rpgDevOptions.Name = "rpgDevOptions";
+            bsiStopwatchOutput.Id = 6;
+            bsiStopwatchOutput.Name = "bsiStopwatchOutput";
             // 
             // MainForm
             // 
@@ -149,5 +156,6 @@
         private DevExpress.XtraBars.BarButtonItem bbiTestEndpoint;
         private DevExpress.XtraBars.BarButtonItem bbiEncryptPassword;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgDevOptions;
+        private DevExpress.XtraBars.BarStaticItem bsiStopwatchOutput;
     }
 }

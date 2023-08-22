@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using DevExpress.XtraGrid;
@@ -145,6 +146,9 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
             // Todo: DS: Handle exception when the REST API is not available or _modelType is not set
             throw;
         }
+
+        if (MainForm.Stopwatch.IsRunning)
+            MainForm.Stopwatch.Stop();
     }
 
     private async Task<bool> FetchData()
@@ -156,7 +160,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
             // Prepare the request
             var request = new HttpRequestMessage(HttpMethod.Get, $"/Paginated/{ActionName}");
             var jsonParams = JsonSerializer.Serialize(FiltrationParams, HttpExtensions.Options);
-            request.Content = new StringContent(jsonParams, "application/json");
+            request.Content = new StringContent(jsonParams, Encoding.UTF8, "application/json");
 
             // Send the request
             var response = await _client.SendAsync(request);

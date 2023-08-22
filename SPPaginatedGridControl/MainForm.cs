@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using DevExpress.XtraBars;
 using DevExpress.XtraBars.Ribbon;
@@ -13,12 +14,31 @@ namespace SPPaginatedGridControl;
 
 public partial class MainForm : RibbonForm
 {
+    public static readonly Stopwatch Stopwatch = new();
     private readonly Sp7GridControl<CustomFiltrationParams, FiltrationHeader> _gridControl;
 
     public MainForm()
     {
-
         InitializeComponent();
+
+        if (Stopwatch.Elapsed == TimeSpan.Zero)
+            Stopwatch.Start();
+
+        new Thread(() =>
+        {
+            while (true)
+            {
+                Thread.Sleep(100);
+
+                if (Stopwatch.Elapsed == TimeSpan.Zero)
+                    continue;
+
+                Invoke(() => bsiStopwatchOutput.Caption = $@"Elapsed: {Stopwatch.ElapsedMilliseconds} ms");
+
+                if (!Stopwatch.IsRunning)
+                    return;
+            }
+        }).Start();
 
         // Create an instance of the custom grid control
         _gridControl = new Sp7GridControl<CustomFiltrationParams, FiltrationHeader>
@@ -31,6 +51,7 @@ public partial class MainForm : RibbonForm
             {
                 CustomFilter = "test",
                 CurrentPage = 1,
+                // PageSize = int.MaxValue
                 PageSize = 50
             }
         };
@@ -76,12 +97,8 @@ public partial class MainForm : RibbonForm
 
         var passwordBytes = Encoding.UTF8.GetBytes(passwordPlainText);
 
-        using var reader = new StreamReader(Path.Combine("ServerPublicKey", "public_key.pem"));
-        var pemContents = reader.ReadToEnd();
-
         //New RSA Parameters with public key
-        var rsa = RSA.Create();
-        rsa.ImportFromPem(pemContents);
+        var rsa = RSA.Create().ImportKeyAndCache(Path.Combine("ServerPublicKey", "public_key.pem"));
 
         var encryptedPasswordBytes = passwordBytes.HybridEncrypt(rsa);
         var base64EncryptedPassword = Convert.ToBase64String(encryptedPasswordBytes);

@@ -34,11 +34,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var encryptedPasswordBytes = Convert.FromBase64String(encryptedPasswordBase64);
 
-        var pemContents = System.IO.File.ReadAllText(Path.Combine(ContentRootPath, "EncryptionKeys", "private_key.pem"));
-
-        //New RSA Parameters with private key
-        var rsa = RSA.Create();
-        rsa.ImportFromPem(pemContents);
+        var rsa = RSA.Create().ImportKeyAndCache(Path.Combine(ContentRootPath, "EncryptionKeys", "private_key.pem"));
 
         // Decrypt the password
         var decryptedPassword = encryptedPasswordBytes.HybridDecrypt(rsa);
