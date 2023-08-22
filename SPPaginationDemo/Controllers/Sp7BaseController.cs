@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using SPPaginationDemo.Filtration;
 using SPPaginationDemo.ModelGenerator;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using SPPaginationDemo.Extensions;
 #pragma warning disable CS1998
 
 namespace SPPaginationDemo.Controllers;
@@ -14,13 +17,41 @@ namespace SPPaginationDemo.Controllers;
 public abstract class Sp7ControllerBase : Controller
 {
     private readonly IMapper _mapper;
+    private readonly IConfiguration _configuration;
+    public readonly string ContentRootPath;
+
     private static readonly Dictionary<string, DynamicTypeGenerator> DynamicTypeGenerators = new();
 
-    private const string ConnectionString = @"Server=SPAG-DS\SQL2019;Database=SP6;Integrated Security=true;Connection Timeout=60;TrustServerCertificate=true";
+    private string ConnectionString => string.Format(_configuration.GetConnectionString("DefaultConnection") ??
+                                                     throw new InvalidOperationException("No connection string named 'DefaultConnection' was found in the configuration."), GetDecryptedPassword(_configuration));
 
-    protected Sp7ControllerBase(IMapper mapper)
+    public string GetDecryptedPassword(IConfiguration configuration)
+    {
+        var encryptedPasswordBase64 = configuration["EncryptedPassword"];
+
+        if (string.IsNullOrEmpty(encryptedPasswordBase64))
+            throw new InvalidOperationException("No parameter named 'EncryptedPassword' was found in the configuration.");
+
+        var encryptedPasswordBytes = Convert.FromBase64String(encryptedPasswordBase64);
+
+        using var reader = new StreamReader(Path.Combine(ContentRootPath, "EncryptionKeys", "private_key.pem"));
+        var pemContents = reader.ReadToEnd();
+
+        //New RSA Parameters with private key
+        var rsa = RSA.Create();
+        rsa.ImportFromPem(pemContents);
+
+        // Decrypt the password
+        var decryptedPassword = encryptedPasswordBytes.HybridDecrypt(rsa);
+        var passwordString = Encoding.UTF8.GetString(decryptedPassword);
+        return passwordString;
+    }
+
+    protected Sp7ControllerBase(IMapper mapper, IConfiguration configuration, string contentRootPath)
     {
         _mapper = mapper;
+        _configuration = configuration;
+        ContentRootPath = contentRootPath;
     }
 
     private IEndpoint? GetEndpoint(string actionName)
@@ -40,6 +71,8 @@ public abstract class Sp7ControllerBase : Controller
         if (endpoint == null)
             return BadRequest();
 
+        endpoint.ControllerBase = this;
+
         var sqlQuery = await endpoint.SqlQuery;
 
         var sqlIdentifier = DynamicTypeGenerator.GetIdentifier(sqlQuery);
@@ -47,7 +80,7 @@ public abstract class Sp7ControllerBase : Controller
         if (DynamicTypeGenerators.ContainsKey(sqlIdentifier))
             return Ok(sqlIdentifier);
 
-        var dynamicTypeGenerator = new DynamicTypeGenerator(sqlQuery, typeof(IGeneratedEntity), ConnectionString);
+        var dynamicTypeGenerator = new DynamicTypeGenerator(sqlQuery, typeof(IGeneratedEntity), ConnectionString, ContentRootPath);
         DynamicTypeGenerators.Add(sqlIdentifier, dynamicTypeGenerator);
 
         return Ok(sqlIdentifier);
@@ -101,7 +134,7 @@ public abstract class Sp7ControllerBase : Controller
         {
             if (filtrationParams == null) return BadRequest();
 
-            dynamicTypeGenerator = new DynamicTypeGenerator(demoSelect, typeof(IGeneratedEntity), ConnectionString);
+            dynamicTypeGenerator = new DynamicTypeGenerator(demoSelect, typeof(IGeneratedEntity), ConnectionString, ContentRootPath);
 
             DynamicTypeGenerators.Add(sqlIdentifier, dynamicTypeGenerator);
         }

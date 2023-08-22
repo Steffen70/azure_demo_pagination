@@ -9,12 +9,13 @@ namespace SPPaginationDemo.Controllers;
 
 public class PaginatedController : Sp7ControllerBase
 {
-    public PaginatedController(IMapper mapper) : base(mapper) { }
+    public PaginatedController(IMapper mapper, IConfiguration configuration, IWebHostEnvironment env) : base(mapper, configuration, env.ContentRootPath) { }
 
     public class DemoSelect : Endpoint<IGeneratedEntity, CustomFiltrationParams>
     {
-        //TODO: Add default implementation to Endpoint<TGenerated> class
-        protected override async Task<string> GetSqlQueryAsync() => await System.IO.File.ReadAllTextAsync("demo_sql_abfrage.sql");
+        // Todo: DS: Add default implementation to Endpoint<TGenerated> class
+        protected override async Task<string> GetSqlQueryAsync() =>
+            await System.IO.File.ReadAllTextAsync(Path.Combine(ControllerBase.ContentRootPath, "demo_sql_abfrage.sql"));
 
         public override IQueryable<TGenerated> QueryFilter<TGenerated>(IQueryable<TGenerated> queryable, CustomFiltrationParams filtrationParams)
         {
@@ -30,11 +31,11 @@ public class PaginatedController : Sp7ControllerBase
 
         public override async Task<IActionResult> InMemoryProcessingAsync<TGenerated>(List<TGenerated> paginatedResult, CustomFiltrationParams filtrationParams)
         {
-            //TODO: List to DataTable extension method
+            // Todo: DS: List to DataTable extension method
 
             paginatedResult.ForEach(d => d.Vorname = d.Vorname?.ToUpper());
 
-            //TODO: Make DataTable serializable
+            // Todo: DS: Make DataTable serializable
 
             return ControllerBase.Ok(paginatedResult);
         }

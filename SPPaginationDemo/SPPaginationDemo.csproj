@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -58,18 +58,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DevExpress.XtraEditors.v21.2">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\DevExpress 21.2\Components\Offline Packages\devexpress.win.navigation\21.2.7\lib\netcoreapp3.0\DevExpress.XtraEditors.v21.2.dll</HintPath>
-    </Reference>
-
     <Reference Include="SP6LogicDemo">
       <HintPath>..\SP6LogicDemo\bin\$(Configuration)\net7.0-windows\SP6LogicDemo.dll</HintPath>
       <Private>True</Private>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="UpdateAsseblies\" />
   </ItemGroup>
 
 </Project>

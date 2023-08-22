@@ -24,12 +24,12 @@ public class DynamicTypeGenerator
         return hexString;
     }
 
-    public DynamicTypeGenerator(string sqlQuery, Type interfaceType, string connectionString)
+    public DynamicTypeGenerator(string sqlQuery, Type interfaceType, string connectionString, string contentRootPath)
     {
         var columns = AnalyzeQuery(sqlQuery, connectionString);
         var typeName = $"DynamicType_{GetIdentifier(sqlQuery)}";
 
-        var template = File.ReadAllText("dynamic_type_template.txt");
+        var template = File.ReadAllText(Path.Combine(contentRootPath, "dynamic_type_template.txt"));
 
         var properties = string.Join(Environment.NewLine, columns.Select(column =>
         {
@@ -46,8 +46,8 @@ public class DynamicTypeGenerator
 
         var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-        var references = 
-            new[] {Net70.References.SystemRuntime, Net70.References.SystemCore, MetadataReference.CreateFromFile(interfaceType.Assembly.Location) };
+        var references =
+            new[] { Net70.References.SystemRuntime, Net70.References.SystemCore, MetadataReference.CreateFromFile(interfaceType.Assembly.Location) };
 
         var assemblyName = Path.GetRandomFileName();
         var compilation = CSharpCompilation.Create(
@@ -55,12 +55,12 @@ public class DynamicTypeGenerator
             syntaxTrees: new[] { syntaxTree },
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithPlatform(Platform.X64));
+                .WithPlatform(Platform.X86));
 
         using var ms = new MemoryStream();
         var result = compilation.Emit(ms);
 
-        //TODO: Add error handling when compilation fails
+        // Todo: DS: Add error handling when compilation fails
         if (!result.Success)
             throw new Exception("Compilation failed");
 

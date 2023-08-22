@@ -3,13 +3,69 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using Newtonsoft.Json;
+using AutoMapper;
 
 namespace SPPaginationDemo.Controllers;
+
+public class FileInfoModel
+{
+    public string Name { get; set; } = null!;
+    public string Path { get; set; } = null!;
+    public bool IsDirectory { get; set; }
+    public List<FileInfoModel> Children { get; set; } = new();
+}
 
 [ApiController]
 [Route("server-call/")]
 public class LogicController : Controller
 {
+    private readonly IWebHostEnvironment _env;
+
+    public LogicController(IWebHostEnvironment env)
+    {
+        _env = env;
+    }
+
+    [HttpGet("files-structure")]
+    public ActionResult<FileInfoModel> GetFilesStructure()
+    {
+        try
+        {
+            var rootDirectory = _env.ContentRootPath;
+            return Ok(GetDirectoryStructure(rootDirectory));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+
+    private static FileInfoModel GetDirectoryStructure(string rootPath)
+    {
+        var directoryInfo = new DirectoryInfo(rootPath);
+        var root = new FileInfoModel
+        {
+            Name = directoryInfo.Name,
+            Path = directoryInfo.FullName,
+            IsDirectory = true
+        };
+
+        foreach (var dir in directoryInfo.GetDirectories()) 
+            root.Children.Add(GetDirectoryStructure(dir.FullName));
+
+        foreach (var file in directoryInfo.GetFiles())
+            root.Children.Add(new FileInfoModel
+            {
+                Name = file.Name,
+                Path = file.FullName,
+                IsDirectory = false
+            });
+
+        return root;
+    }
+
+
     [HttpPost("callback/{typeName}/{methodName}")]
     public async Task<ActionResult> ServerCall(string typeName, string methodName)
     {

@@ -1,0 +1,47 @@
+az login
+
+# Create a resource group
+az group create --name Demo-Env --location switzerlandnorth
+
+# Create an Azure SQL Server
+az sql server create --name Demo-SQL-SPAG --resource-group Demo-Env --location switzerlandnorth --admin-user ds-spag --admin-password "{0}"
+
+# Create an Azure SQL Database in the server
+az sql db create --resource-group Demo-Env --server Demo-SQL-SPAG --name DemoAppDb --edition Basic --zone-redundant false
+
+# Add firewall rule to allow your IP address
+az sql server firewall-rule create --resource-group Demo-Env --server Demo-SQL-SPAG --name DevAccessRule --start-ip-address 141.195.95.194 --end-ip-address 141.195.95.194
+
+# Generate Schema SQL with MSSQL wizard
+SP6 > Tasks > Generate Scripts > Specific database objects > Advanced Scripting Options > Types of data to script > Schema Only > Proceed through the wizard
+
+C:\backup\schema_export.sql
+
+# Target DemoAppDb and replace with use in script
+USE [DemoAppDb]
+
+# Backup SP6 data
+bcp SP6.dbo.Anstellungen out "C:\backup\Anstellungen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Personen out "C:\backup\Personen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Arbeitgeber out "C:\backup\Arbeitgeber.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Abteilungen out "C:\backup\Abteilungen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Stiftungen out "C:\backup\Stiftungen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Rentner out "C:\backup\Rentner.bcp" -S "SPAG-DS\SQL2019" -T -n
+
+# Anstellungen depends on all other tables so make sure you import them first
+
+# Import Data to Azure SQL Database from .bcp files
+bcp "DemoAppDb.dbo.Rentner" in "C:\backup\Rentner.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
+bcp "DemoAppDb.dbo.Stiftungen" in "C:\backup\Stiftungen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
+bcp "DemoAppDb.dbo.Abteilungen" in "C:\backup\Abteilungen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
+bcp "DemoAppDb.dbo.Arbeitgeber" in "C:\backup\Arbeitgeber.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n -q
+bcp "DemoAppDb.dbo.Personen" in "C:\backup\Personen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
+bcp "DemoAppDb.dbo.Anstellungen" in "C:\backup\Anstellungen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
+
+# Create an App Service Plan
+az appservice plan create --name SPPaginationDemo-Service-Plan --resource-group Demo-Env --sku F1
+
+# Create a Web App
+az webapp create --resource-group Demo-Env --plan SPPaginationDemo-Service-Plan --name SPPaginationDemo
+
+powershell ./publish.ps1
