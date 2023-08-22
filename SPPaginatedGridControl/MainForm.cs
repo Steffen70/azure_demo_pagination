@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Reflection;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using DevExpress.XtraBars;
 using DevExpress.XtraBars.Ribbon;
@@ -8,8 +6,8 @@ using DevExpress.XtraEditors;
 using SPPaginationDemo.Filtration;
 using SPPaginationDemo.Filtration.Custom;
 using DevExpress.XtraGrid.Views.Grid;
-using DevExpress.CodeParser;
 using SP6LogicDemo;
+using SPPaginationDemo.Extensions;
 
 namespace SPPaginatedGridControl;
 
@@ -26,7 +24,8 @@ public partial class MainForm : RibbonForm
         _gridControl = new Sp7GridControl<CustomFiltrationParams, FiltrationHeader>
         {
             Dock = DockStyle.Fill,
-            BaseUrl = "https://localhost:7269/",
+            BaseUrl = "https://sppaginationdemo.azurewebsites.net/",
+            // BaseUrl = "https://localhost:7269/",
             ActionName = "DemoSelect",
             FiltrationParams = new CustomFiltrationParams
             {
@@ -53,12 +52,41 @@ public partial class MainForm : RibbonForm
         try
         {
             var logic = new Logic();
+
+            // Todo: DS: Add properties to Blueprint objetct and allow to pass the object to the server
+
             var processName = logic.GetProgramName();
+
+            // Todo: DS: Add SignalR support to the server and client to avoid timeout errors
+
             XtraMessageBox.Show($"Hello from {processName}!");
         }
         catch (Exception exception)
         {
             XtraMessageBox.Show(exception.Message);
         }
+    }
+
+    private void OnItemClick_bbiEncryptPassword(object sender, ItemClickEventArgs e)
+    {
+        var passwordPlainText = XtraInputBox.Show("Enter password", "Encrypt password", null, MessageBoxButtons.OK);
+
+        if (string.IsNullOrEmpty(passwordPlainText))
+            return;
+
+        var passwordBytes = Encoding.UTF8.GetBytes(passwordPlainText);
+
+        using var reader = new StreamReader(Path.Combine("ServerPublicKey", "public_key.pem"));
+        var pemContents = reader.ReadToEnd();
+
+        //New RSA Parameters with public key
+        var rsa = RSA.Create();
+        rsa.ImportFromPem(pemContents);
+
+        var encryptedPasswordBytes = passwordBytes.HybridEncrypt(rsa);
+        var base64EncryptedPassword = Convert.ToBase64String(encryptedPasswordBytes);
+
+        // Copy encrypted password to clipboard
+        Clipboard.SetText(base64EncryptedPassword);
     }
 }

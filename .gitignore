@@ -68,4 +68,4 @@ publish/
 # Custom files/directories
 /SPPaginationDemo/UpdateAsseblies/*
 *.pem
-/SPPaginationDemo/EncryptionKeys/public_key.pem
+*.zip

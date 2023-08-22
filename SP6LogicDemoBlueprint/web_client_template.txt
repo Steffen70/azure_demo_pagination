@@ -10,7 +10,8 @@
 
             _client = new HttpClient
             {
-                BaseAddress = new Uri("https://localhost:7269/")
+                BaseAddress = new Uri("https://sppaginationdemo.azurewebsites.net/")
+                // BaseAddress = new Uri("https://localhost:7269/")
             };
 
             // Add default headers as necessary

@@ -35,7 +35,7 @@ foreach (var type in assembly.GetTypes().Where(t => t.Namespace == assemblyNames
     var newClassDeclaration = SyntaxFactory.ClassDeclaration(typeName)
         .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
 
-    // TODO: maybe remove DeclaredOnly to get inherited methods
+    // Todo: DS: maybe remove DeclaredOnly to get inherited methods
     foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
     {
         var returnType = $"{method.ReturnType.Namespace}.{method.ReturnType.Name}";
@@ -63,7 +63,7 @@ foreach (var type in assembly.GetTypes().Where(t => t.Namespace == assemblyNames
             .Select(line => SyntaxFactory.ParseStatement(line).WithTrailingTrivia(SyntaxFactory.CarriageReturn))
             .ToList();
 
-        //TODO: add support for async methods
+        // Todo: DS: add support for async methods
 
         // else if return type is string add return statement
         if (method.ReturnType == typeof(string))
@@ -73,7 +73,7 @@ foreach (var type in assembly.GetTypes().Where(t => t.Namespace == assemblyNames
         else if (method.ReturnType is { IsSerializable: true, IsPrimitive: false })
             statementsList.Add(SyntaxFactory.ReturnStatement(SyntaxFactory.ParseExpression($"JsonSerializer.Deserialize<{returnType}>(stringResult)!")));
         
-        //TODO: add support for nullable types
+        // Todo: DS: add support for nullable types
 
         // else if return type is not void add return statement try to parse the result
         else if (method.ReturnType != typeof(void))
@@ -132,7 +132,7 @@ var compilationUnit = SyntaxFactory.CompilationUnit()
     .AddMembers(newNamespaceDeclaration);
 
 var formattedCode = compilationUnit.NormalizeWhitespace().ToFullString();
-var sourceText = SourceText.From(formattedCode, Encoding.UTF8);
+var sourceText = SourceText.From(formattedCode);
 var syntaxTree = CSharpSyntaxTree.ParseText(sourceText);
 
 var refenrences = new[] {
@@ -151,7 +151,7 @@ var compilation = CSharpCompilation.Create(
     syntaxTrees: new[] { syntaxTree },
     references: refenrences,
     options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-        .WithPlatform(Platform.X64)
+        .WithPlatform(Platform.X86)
         .WithNullableContextOptions(NullableContextOptions.Enable)
 #if RELEASE
         .WithOptimizationLevel(OptimizationLevel.Release));
@@ -175,7 +175,7 @@ var result = compilation.Emit(
     , pdbStream: pdbStream);
 #endif
 
-//TODO: Add error handling when compilation fails
+// Todo: DS: Add error handling when compilation fails
 if (!result.Success)
     throw new Exception("Compilation failed");
 

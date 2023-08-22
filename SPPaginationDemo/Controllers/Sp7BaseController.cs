@@ -34,8 +34,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var encryptedPasswordBytes = Convert.FromBase64String(encryptedPasswordBase64);
 
-        using var reader = new StreamReader(Path.Combine(ContentRootPath, "EncryptionKeys", "private_key.pem"));
-        var pemContents = reader.ReadToEnd();
+        var pemContents = System.IO.File.ReadAllText(Path.Combine(ContentRootPath, "EncryptionKeys", "private_key.pem"));
 
         //New RSA Parameters with private key
         var rsa = RSA.Create();

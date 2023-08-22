@@ -42,12 +42,13 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:7269/Paginated/DemoSelect",
+					"raw": "https://sppaginationdemo.azurewebsites.net/Paginated/DemoSelect",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"sppaginationdemo",
+						"azurewebsites",
+						"net"
 					],
-					"port": "7269",
 					"path": [
 						"Paginated",
 						"DemoSelect"
@@ -82,12 +83,13 @@
 					}
 				],
 				"url": {
-					"raw": "https://localhost:7269/Paginated/sql-query-identifier/DemoSelect",
+					"raw": "https://sppaginationdemo.azurewebsites.net/Paginated/sql-query-identifier/DemoSelect",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"sppaginationdemo",
+						"azurewebsites",
+						"net"
 					],
-					"port": "7269",
 					"path": [
 						"Paginated",
 						"sql-query-identifier",
@@ -121,12 +123,13 @@
 					}
 				],
 				"url": {
-					"raw": "https://localhost:7269/Paginated/assembly-bytes/{{sql_query_identifier}}",
+					"raw": "https://sppaginationdemo.azurewebsites.net/Paginated/assembly-bytes/{{sql_query_identifier}}",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"sppaginationdemo",
+						"azurewebsites",
+						"net"
 					],
-					"port": "7269",
 					"path": [
 						"Paginated",
 						"assembly-bytes",
@@ -137,22 +140,44 @@
 			"response": []
 		},
 		{
-			"name": "live-update/DemoUpdate/DemoCallback",
+			"name": "server-call/callback/SP6LogicDemo.Logic/GetProgramName",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:7269/server-call/callback/SP6LogicDemo.Logic/GetProgramName",
+					"raw": "https://sppaginationdemo.azurewebsites.net/server-call/callback/SP6LogicDemo.Logic/GetProgramName",
 					"protocol": "https",
 					"host": [
-						"localhost"
+						"sppaginationdemo",
+						"azurewebsites",
+						"net"
 					],
-					"port": "7269",
 					"path": [
 						"server-call",
 						"callback",
 						"SP6LogicDemo.Logic",
 						"GetProgramName"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "server-call/files-structure",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://sppaginationdemo.azurewebsites.net/server-call/files-structure",
+					"protocol": "https",
+					"host": [
+						"sppaginationdemo",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"server-call",
+						"files-structure"
 					]
 				}
 			},

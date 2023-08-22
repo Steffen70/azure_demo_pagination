@@ -15,8 +15,8 @@ namespace SPPaginatedGridControl;
 
 public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridControl where TFiltrationParams : FiltrationParams where TFiltrationHeader : FiltrationHeader
 {
-    //TODO: Override find panel to use the custom filtration header
-    //TODO: Disable data fetching when sorting or filtering
+    // Todo: DS: Override find panel to use the custom filtration header
+    // Todo: DS: Disable data fetching when sorting or filtering
 
     private dynamic _defaultDataSource = null!;
 
@@ -142,7 +142,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
         }
         catch (Exception _)
         {
-            //TODO: Handle exception when the REST API is not available or _modelType is not set
+            // Todo: DS: Handle exception when the REST API is not available or _modelType is not set
             throw;
         }
     }
@@ -156,7 +156,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
             // Prepare the request
             var request = new HttpRequestMessage(HttpMethod.Get, $"/Paginated/{ActionName}");
             var jsonParams = JsonSerializer.Serialize(FiltrationParams, HttpExtensions.Options);
-            request.Content = new StringContent(jsonParams, Encoding.UTF8, "application/json");
+            request.Content = new StringContent(jsonParams, "application/json");
 
             // Send the request
             var response = await _client.SendAsync(request);
@@ -186,7 +186,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
         }
         catch (Exception _)
         {
-            //TODO: Handle exception when fetching data from the REST API fails
+            // Todo: DS: Handle exception when fetching data from the REST API fails
             return false;
         }
     }

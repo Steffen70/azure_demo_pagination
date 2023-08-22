@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -18,8 +18,7 @@
   <Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\SP6LogicDemoBlueprint.exe SP6LogicDemo" />
 
-    <Copy SourceFiles="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\Blueprint_SP6LogicDemo.dll"
-          DestinationFiles="$(OutputPath)\SP6LogicDemo.dll" />
+    <Copy SourceFiles="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\Blueprint_SP6LogicDemo.dll" DestinationFiles="$(OutputPath)\SP6LogicDemo.dll" />
   </Target>
 
   <ItemGroup>
@@ -41,6 +40,12 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ServerPublicKey\public_key.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
 
 <!--<Project Sdk="Microsoft.NET.Sdk">
@@ -48,7 +53,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -84,6 +89,12 @@
     <Reference Include="SP6LogicDemo">
       <HintPath>$(OutputPath)\SP6LogicDemo.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="EncryptionKeys\public_key.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>-->
