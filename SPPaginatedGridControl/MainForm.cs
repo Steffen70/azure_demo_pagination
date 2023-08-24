@@ -14,34 +14,11 @@ namespace SPPaginatedGridControl;
 
 public partial class MainForm : RibbonForm
 {
-    public static readonly Stopwatch Stopwatch = new();
     private readonly Sp7GridControl<CustomFiltrationParams, FiltrationHeader> _gridControl;
 
-    public MainForm()
+    public MainForm(int pageSize)
     {
         InitializeComponent();
-
-        // Start the stopwatch and create a thread to update the elapsed time
-        if (Stopwatch.Elapsed == TimeSpan.Zero)
-        {
-            Stopwatch.Start();
-
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(100);
-
-                    if (Stopwatch.Elapsed == TimeSpan.Zero)
-                        continue;
-
-                    Invoke(() => bsiStopwatchOutput.Caption = $@"Elapsed: {Stopwatch.ElapsedMilliseconds} ms");
-
-                    if (!Stopwatch.IsRunning)
-                        return;
-                }
-            }).Start();
-        }
 
         // Create an instance of the custom grid control
         _gridControl = new Sp7GridControl<CustomFiltrationParams, FiltrationHeader>
@@ -54,10 +31,12 @@ public partial class MainForm : RibbonForm
             {
                 CustomFilter = "test",
                 CurrentPage = 1,
-                // PageSize = int.MaxValue
-                PageSize = 50
+                PageSize = pageSize
             }
         };
+
+        _gridControl.TypeLoadingStopwatch.ObserveElapsed += (_, e) => bsiTypeLoadingElapsed.Caption = $@"Type Loading: {e} ms";
+        _gridControl.DataFetchingStopwatch.ObserveElapsed += (_, e) => bsiDataFetchingElapsed.Caption = $@"Data Fetching: {e} ms";
 
         // Add the grid control to the MainForm
         pContent.Controls.Add(_gridControl);

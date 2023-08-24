@@ -39,14 +39,15 @@
             rpgUpdateGroup = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             rpgDevOptions = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             pContent = new Panel();
-            bsiStopwatchOutput = new DevExpress.XtraBars.BarStaticItem();
+            bsiTypeLoadingElapsed = new DevExpress.XtraBars.BarStaticItem();
+            bsiDataFetchingElapsed = new DevExpress.XtraBars.BarStaticItem();
             ((System.ComponentModel.ISupportInitialize)rcMainRibbon).BeginInit();
             SuspendLayout();
             // 
             // rcMainRibbon
             // 
             rcMainRibbon.ExpandCollapseItem.Id = 0;
-            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiEncryptPassword, bsiStopwatchOutput });
+            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiEncryptPassword, bsiTypeLoadingElapsed, bsiDataFetchingElapsed });
             rcMainRibbon.Location = new Point(0, 0);
             rcMainRibbon.MaxItemId = 7;
             rcMainRibbon.Name = "rcMainRibbon";
@@ -95,7 +96,8 @@
             // rpgDynamicConstruction
             // 
             rpgDynamicConstruction.ItemLinks.Add(bbiTestEndpoint);
-            rpgDynamicConstruction.ItemLinks.Add(bsiStopwatchOutput);
+            rpgDynamicConstruction.ItemLinks.Add(bsiTypeLoadingElapsed);
+            rpgDynamicConstruction.ItemLinks.Add(bsiDataFetchingElapsed);
             rpgDynamicConstruction.Name = "rpgDynamicConstruction";
             // 
             // rpAdmin
@@ -122,10 +124,15 @@
             pContent.Size = new Size(1091, 406);
             pContent.TabIndex = 1;
             // 
-            // bsiStopwatchOutput
+            // bsiTypeLoadingElapsed
             // 
-            bsiStopwatchOutput.Id = 6;
-            bsiStopwatchOutput.Name = "bsiStopwatchOutput";
+            bsiTypeLoadingElapsed.Id = 6;
+            bsiTypeLoadingElapsed.Name = "bsiTypeLoadingElapsed";
+            // 
+            // bsiDataFetchingElapsed
+            // 
+            bsiDataFetchingElapsed.Id = 7;
+            bsiDataFetchingElapsed.Name = "bsiDataFetchingElapsed";
             // 
             // MainForm
             // 
@@ -156,6 +163,7 @@
         private DevExpress.XtraBars.BarButtonItem bbiTestEndpoint;
         private DevExpress.XtraBars.BarButtonItem bbiEncryptPassword;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgDevOptions;
-        private DevExpress.XtraBars.BarStaticItem bsiStopwatchOutput;
+        private DevExpress.XtraBars.BarStaticItem bsiTypeLoadingElapsed;
+        private DevExpress.XtraBars.BarStaticItem bsiDataFetchingElapsed;
     }
 }

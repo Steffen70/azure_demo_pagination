@@ -1,11 +1,10 @@
-﻿using System.Net.Http.Headers;
-using System.Reflection;
+﻿using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Text;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using Newtonsoft.Json;
-using SPPaginationDemo.Extensions;
 using SPPaginationDemo.Filtration;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 // ReSharper disable RedundantCatchClause
@@ -18,9 +17,11 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
     // Todo: DS: Override find panel to use the custom filtration header
     // Todo: DS: Disable data fetching when sorting or filtering
 
+    public readonly CustomStopwatch TypeLoadingStopwatch = new();
+    public readonly CustomStopwatch DataFetchingStopwatch = new();
+
     private dynamic _defaultDataSource = null!;
 
-    private string? _queryIdentifier;
     private HttpClient _client = null!;
     private Type? _modelType;
 
@@ -69,7 +70,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
         _view = (GridView)MainView;
         _view.TopRowChanged += ViewTopRowChanged;
         Resize += ViewTopRowChanged;
-
+            
         _ = InitializeAsync();
     }
 
@@ -104,31 +105,18 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
     {
         try
         {
-            // Get the query identifier from the REST API
-            _queryIdentifier = (await _client.GetStringAsync($"/Paginated/sql-query-identifier/{ActionName}")).Replace("\"", "");
-
-            // Get the assembly bytes from the REST API
-            var assemblyString = (await _client.GetStringAsync($"/Paginated/assembly-bytes/{_queryIdentifier}")).Replace("\"", "");
-
-            var assemblyBytes = Convert.FromBase64String(assemblyString).Decompress();
-
-            //await File.WriteAllBytesAsync("assembly_clientside.dll", assemblyBytes);
-
-            // Load the assembly and get the type
-            var assembly = Assembly.Load(assemblyBytes);
-            var typeName = $"DynamicType_{_queryIdentifier}";
-            _modelType = assembly.GetTypes().First(t => t.Name == typeName);
-
-            if (_modelType == null) throw new InvalidOperationException("The model type is not set.");
+            _modelType = await _client.LoadTypeFromServerOrCacheAsync(ActionName, TypeLoadingStopwatch);
 
             _defaultDataSource = Activator.CreateInstance(typeof(List<>).MakeGenericType(_modelType))!;
             _view.GridControl.DataSource = _defaultDataSource;
 
             _isFetchingData = true;
+            DataFetchingStopwatch.Start();
 
             // Fetch the first page of data
             await FetchData();
 
+            DataFetchingStopwatch.Stop();
             _isFetchingData = false;
 
             // Configure columns
@@ -145,9 +133,6 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
             // Todo: DS: Handle exception when the REST API is not available or _modelType is not set
             throw;
         }
-
-        if (MainForm.Stopwatch.IsRunning)
-            MainForm.Stopwatch.Stop();
     }
 
     private async Task<bool> FetchData()

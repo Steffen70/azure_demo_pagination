@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SPPaginatedGridControl": {
+      "commandName": "Project",
+      "commandLineArgs": "int.MaxValue"
+    }
+  }
+}

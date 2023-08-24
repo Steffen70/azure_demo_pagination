@@ -76,6 +76,7 @@ public class LogicController : Controller
         var parameters = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
         // create instance of type by typeName
+        // Todo: DS: Add dependency injection pipeline
         var type = GetType(typeName);
         var instance = Activator.CreateInstance(type);
 
