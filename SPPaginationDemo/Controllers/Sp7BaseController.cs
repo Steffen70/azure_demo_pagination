@@ -43,7 +43,7 @@ public abstract class Sp7ControllerBase : Controller
     [HttpGet("assembly-bytes/{*sqlIdentifier}")]
     public ActionResult<string> GetAssemblyBytes(string sqlIdentifier)
     {
-        var dtoCache = new RedisCacheFactory(_logger,_appsettings, sqlIdentifier);
+        var dtoCache = new RedisCacheFactory(_logger, _appsettings, sqlIdentifier);
 
         if (!dtoCache.IsCached)
             throw new InvalidOperationException("No type with the specified identifier was found in the cache.");
@@ -78,24 +78,33 @@ public abstract class Sp7ControllerBase : Controller
         var filtrationParams = await filterationParamsTask;
         if (filtrationParams == null) return BadRequest();
 
-        var generatorWrapper = new SqlGeneratorFactory(_logger,_appsettings, actionName, typeof(IDemoSelect));
+        var generatorWrapper = new SqlGeneratorFactory(_logger, _appsettings, actionName, typeof(IDemoSelect));
 
-        var dtoWrapper = new RedisCacheFactory(_logger,_appsettings, generatorWrapper.SqlIdentifier);
+        var dtoWrapper = new RedisCacheFactory(_logger, _appsettings, generatorWrapper.SqlIdentifier);
 
         if (!dtoWrapper.IsCached)
-            dtoWrapper = new RedisCacheFactory(_logger,_appsettings, generatorWrapper);
+            dtoWrapper = new RedisCacheFactory(_logger, _appsettings, generatorWrapper);
 
-        var generatedSp7Context = typeof(Sp7Context<>).MakeGenericType(dtoWrapper.Model);
+        var model = dtoWrapper.Model;
 
-        dynamic sp6Context = Activator.CreateInstance(generatedSp7Context, new DbContextOptionsBuilder().UseSqlServer(_appsettings.SqlConnectionString).Options)!;
+        var generatedSp7Context = typeof(Sp7Context<>).MakeGenericType(model);
+
+        dynamic sp6Context = Activator.CreateInstance(generatedSp7Context, new DbContextOptionsBuilder()
+            .UseSqlServer(_appsettings.SqlConnectionString, providerOptions =>
+            {
+                providerOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+            }).Options)!;
 
         var fromSqlRawMethod = typeof(RelationalQueryableExtensions).GetMethod(nameof(RelationalQueryableExtensions.FromSqlRaw))!;
 
-        var genericFromSqlRawMethod = fromSqlRawMethod.MakeGenericMethod(dtoWrapper.Model);
+        var genericFromSqlRawMethod = fromSqlRawMethod.MakeGenericMethod(model);
 
         dynamic selection = genericFromSqlRawMethod.Invoke(null, new object[] { sp6Context.GeneratedModel, generatorWrapper.SqlQuery, Array.Empty<object>() })!;
 
-        var genericFiltration = queryFilter.MakeGenericMethod(dtoWrapper.Model);
+        var genericFiltration = queryFilter.MakeGenericMethod(model);
 
         var genericFiltrationTask = new Task<dynamic>(() =>
             genericFiltration.Invoke(endpoint, new object[] { selection, filtrationParams })!);
@@ -109,7 +118,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var addResultHeaderMethod = GetType().GetMethod(nameof(AddResultHeader))!;
 
-        var genericAddResultMethod = addResultHeaderMethod.MakeGenericMethod(dtoWrapper.Model, filterationParameterType, headerType);
+        var genericAddResultMethod = addResultHeaderMethod.MakeGenericMethod(model, filterationParameterType, headerType);
 
         dynamic addResultHeaderTask = genericAddResultMethod.Invoke(this, new object[] { result, filtrationParams })!;
 
@@ -117,7 +126,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var endpointMethod = endpointType.GetMethod(nameof(IEndpoint<object, FiltrationParams>.InMemoryProcessingAsync))!;
 
-        var genericEndpointMethod = endpointMethod.MakeGenericMethod(dtoWrapper.Model);
+        var genericEndpointMethod = endpointMethod.MakeGenericMethod(model);
 
         dynamic genericEndpointTask = genericEndpointMethod.Invoke(endpoint, new object[] { modifiedModels.Result, filtrationParams })!;
 

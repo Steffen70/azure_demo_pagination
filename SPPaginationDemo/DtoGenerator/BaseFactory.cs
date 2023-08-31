@@ -2,6 +2,8 @@
 using SPPaginationDemo.Extensions;
 using SPPaginationDemo.Services;
 
+#pragma warning disable CA2254
+
 namespace SPPaginationDemo.DtoGenerator;
 
 public abstract class BaseFactory
@@ -17,14 +19,22 @@ public abstract class BaseFactory
     public byte[] AssemblyBytes =>
         MemoryCache.LazyLoadAndCache($"{TypeName}_AssemblyBytes", () => Convert.FromBase64String(AssemblyString).Decompress());
 
-    public Type Model => MemoryCache.LazyLoadAndCache($"{TypeName}_Model", () =>
+    public Type Model
     {
-        var assembly = Assembly.Load(AssemblyBytes);
+        get
+        {
+            var model = MemoryCache.LazyLoadAndCache($"{TypeName}_Model", () =>
+            {
+                var assembly = Assembly.Load(AssemblyBytes);
 
-        var model = assembly.GetTypes().First(t => t.Name == TypeName);
+                return assembly.GetTypes().First(t => t.Name == TypeName);
+            }, out var fromMemory);
 
-        return model;
-    });
+            Logger.LogInformation($"Retrieved model from {(fromMemory ? "memory" : "redis")} cache for '{SqlIdentifier}'.");
+
+            return model;
+        }
+    }
 
     protected BaseFactory(ILogger logger)
     {

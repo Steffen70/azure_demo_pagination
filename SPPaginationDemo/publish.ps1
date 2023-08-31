@@ -1,9 +1,3 @@
-Write-Host "Stopping Web App and rebooting Redis Cache..."
-
-az webapp stop --resource-group SPAGDS-Dev-RG --name SPAGDS-DevWebApp
-
-az redis force-reboot --name SPAGDS-Dev-RedisDB --resource-group SPAGDS-Dev-RG --reboot-type AllNodes
-
 $publishPath = "./publish"
 $zipPath =  $publishPath + ".zip"
 

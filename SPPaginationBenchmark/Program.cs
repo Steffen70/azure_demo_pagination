@@ -40,7 +40,10 @@ var testProcess = async () =>
     var jsonParams = JsonSerializer.Serialize(filtrationParams, HttpExtensions.Options);
     request.Content = new StringContent(jsonParams, Encoding.UTF8, "application/json");
 
-    _ = await client.SendAsync(request);
+    var response = await client.SendAsync(request);
+
+    if (!response.IsSuccessStatusCode)
+        throw new Exception($"Error: {response.StatusCode} {response.ReasonPhrase}");
 
     stopwatch.Stop();
 
@@ -48,9 +51,14 @@ var testProcess = async () =>
 };
 
 var tasks = new List<Task<int>>();
-for (var i = 0; i < 5; i++) tasks.Add(new Task<int>(() => testProcess().Result));
+for (var i = 0; i < 100; i++) tasks.Add(new Task<int>(() => testProcess().Result));
 
-tasks.ForEach(t => t.Start());
+tasks.ForEach(t =>
+{
+    t.Start();
+
+    Task.Delay(100).Wait();
+});
 
 var results = tasks.Select(t => t.Result).ToArray();
 
