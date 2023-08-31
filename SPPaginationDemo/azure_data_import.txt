@@ -1,0 +1,25 @@
+# Generate Schema SQL with MSSQL wizard
+SP6 > Tasks > Generate Scripts > Specific database objects > Advanced Scripting Options > Types of data to script > Schema Only > Proceed through the wizard
+
+C:\backup\schema_export.sql
+
+# Target SPAGDS-DevDB and replace with use in script
+USE [SPAGDS-DevDB]
+
+# Backup SP6 data
+bcp SP6.dbo.Anstellungen out "C:\backup\Anstellungen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Personen out "C:\backup\Personen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Arbeitgeber out "C:\backup\Arbeitgeber.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Abteilungen out "C:\backup\Abteilungen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Stiftungen out "C:\backup\Stiftungen.bcp" -S "SPAG-DS\SQL2019" -T -n
+bcp SP6.dbo.Rentner out "C:\backup\Rentner.bcp" -S "SPAG-DS\SQL2019" -T -n
+
+# Anstellungen depends on all other tables so make sure you import them first
+
+# Import Data to Azure SQL Database from .bcp files
+bcp "dbo.Rentner" in "C:\backup\Rentner.bcp" -S "SPAGDS-Dev-SQL.database.windows.net" -U "ds-spag" -P "{0}" -d "SPAGDS-DevDB" -n
+bcp "dbo.Stiftungen" in "C:\backup\Stiftungen.bcp" -S "SPAGDS-Dev-SQL.database.windows.net" -U "ds-spag" -P "{0}" -d "SPAGDS-DevDB" -n
+bcp "dbo.Abteilungen" in "C:\backup\Abteilungen.bcp" -S "SPAGDS-Dev-SQL.database.windows.net" -U "ds-spag" -P "{0}" -d "SPAGDS-DevDB" -n
+bcp "dbo.Arbeitgeber" in "C:\backup\Arbeitgeber.bcp" -S "SPAGDS-Dev-SQL.database.windows.net" -U "ds-spag" -P "{0}" -d "SPAGDS-DevDB" -n -q
+bcp "dbo.Personen" in "C:\backup\Personen.bcp" -S "SPAGDS-Dev-SQL.database.windows.net" -U "ds-spag" -P "{0}" -d "SPAGDS-DevDB" -n
+bcp "dbo.Anstellungen" in "C:\backup\Anstellungen.bcp" -S "SPAGDS-Dev-SQL.database.windows.net" -U "ds-spag" -P "{0}" -d "SPAGDS-DevDB" -n

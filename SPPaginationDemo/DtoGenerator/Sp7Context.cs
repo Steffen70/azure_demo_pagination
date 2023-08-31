@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace SPPaginationDemo.ModelGenerator;
+#pragma warning disable IDE0290
+
+namespace SPPaginationDemo.DtoGenerator;
 
 public class Sp7Context<T> : DbContext where T : class
 {

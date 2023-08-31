@@ -23,7 +23,7 @@ var assembly = Assembly.LoadFrom(targetAssemblyPath);
 var allMembers = new List<MemberDeclarationSyntax>();
 
 // load methodbody template from method_body_template.txt
-var methodBodyTemplate = File.ReadAllText(Path.Combine(currentAssemblyPath, "method_body_template.txt"));
+var methodBodyTemplate = File.ReadAllText(Path.Combine(currentAssemblyPath, "CodeTemplates", "method_body.txt"));
 
 // Explore types and methods in the assembly using reflection
 foreach (var type in assembly.GetTypes().Where(t => t.Namespace == assemblyNamespace))
@@ -116,7 +116,7 @@ var usingDirectives = new List<UsingDirectiveSyntax>
     SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Net.Http.Headers")),
 };
 
-var helperClassCode = File.ReadAllText(Path.Combine(currentAssemblyPath, "web_client_template.txt"));
+var helperClassCode = File.ReadAllText(Path.Combine(currentAssemblyPath, "CodeTemplates", "web_client.txt"));
 allMembers.Add(SyntaxFactory.ParseMemberDeclaration(helperClassCode)!);
 
 // 2. Create the namespace declaration.

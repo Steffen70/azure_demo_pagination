@@ -9,6 +9,7 @@ using SPPaginationDemo.Filtration.Custom;
 using DevExpress.XtraGrid.Views.Grid;
 using SP6LogicDemo;
 using SPPaginationDemo.Extensions;
+using SPPaginationDemo.Services;
 
 namespace SPPaginatedGridControl;
 
@@ -24,7 +25,7 @@ public partial class MainForm : RibbonForm
         _gridControl = new Sp7GridControl<CustomFiltrationParams, FiltrationHeader>
         {
             Dock = DockStyle.Fill,
-            BaseUrl = "https://sppaginationdemo.azurewebsites.net/",
+            BaseUrl = "https://spagds-devwebapp.azurewebsites.net/",
             // BaseUrl = "https://localhost:7269/",
             ActionName = "DemoSelect",
             FiltrationParams = new CustomFiltrationParams
@@ -80,12 +81,17 @@ public partial class MainForm : RibbonForm
         var passwordBytes = Encoding.UTF8.GetBytes(passwordPlainText);
 
         //New RSA Parameters with public key
-        var rsa = RSA.Create().ImportKeyAndCache(Path.Combine("ServerPublicKey", "public_key.pem"));
+        var rsa = RSA.Create().ImportKeyAndCache(Path.Combine("ServerEncryptionKeys", "public_key.pem"));
 
         var encryptedPasswordBytes = passwordBytes.HybridEncrypt(rsa);
         var base64EncryptedPassword = Convert.ToBase64String(encryptedPasswordBytes);
 
         // Copy encrypted password to clipboard
         Clipboard.SetText(base64EncryptedPassword);
+    }
+
+    private void OnItemClick_bbiDebug(object sender, ItemClickEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 }

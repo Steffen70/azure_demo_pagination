@@ -1,11 +1,61 @@
 {
 	"info": {
-		"_postman_id": "78c15a36-3efd-4d8d-afb0-9361aa6fc623",
+		"_postman_id": "d17638e8-319d-4d0f-85e9-ed073f5c09da",
 		"name": "Pagination Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "3123028"
 	},
 	"item": [
+		{
+			"name": "Logs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://spagds-devwebapp.azurewebsites.net/Logs",
+					"protocol": "https",
+					"host": [
+						"spagds-devwebapp",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"Logs"
+					]
+				}
+			},
+			"response": []
+		},
 		{
 			"name": "Paginated/DemoSelect",
 			"event": [
@@ -42,10 +92,10 @@
 					}
 				},
 				"url": {
-					"raw": "https://sppaginationdemo.azurewebsites.net/Paginated/DemoSelect",
+					"raw": "https://spagds-devwebapp.azurewebsites.net/Paginated/DemoSelect",
 					"protocol": "https",
 					"host": [
-						"sppaginationdemo",
+						"spagds-devwebapp",
 						"azurewebsites",
 						"net"
 					],
@@ -83,10 +133,10 @@
 					}
 				],
 				"url": {
-					"raw": "https://sppaginationdemo.azurewebsites.net/Paginated/sql-query-identifier/DemoSelect",
+					"raw": "https://spagds-devwebapp.azurewebsites.net/Paginated/sql-query-identifier/DemoSelect",
 					"protocol": "https",
 					"host": [
-						"sppaginationdemo",
+						"spagds-devwebapp",
 						"azurewebsites",
 						"net"
 					],
@@ -123,10 +173,10 @@
 					}
 				],
 				"url": {
-					"raw": "https://sppaginationdemo.azurewebsites.net/Paginated/assembly-bytes/{{sql_query_identifier}}",
+					"raw": "https://spagds-devwebapp.azurewebsites.net/Paginated/assembly-bytes/{{sql_query_identifier}}",
 					"protocol": "https",
 					"host": [
-						"sppaginationdemo",
+						"spagds-devwebapp",
 						"azurewebsites",
 						"net"
 					],
@@ -145,10 +195,10 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "https://sppaginationdemo.azurewebsites.net/server-call/callback/SP6LogicDemo.Logic/GetProgramName",
+					"raw": "https://spagds-devwebapp.azurewebsites.net/server-call/callback/SP6LogicDemo.Logic/GetProgramName",
 					"protocol": "https",
 					"host": [
-						"sppaginationdemo",
+						"spagds-devwebapp",
 						"azurewebsites",
 						"net"
 					],
@@ -168,16 +218,107 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "https://sppaginationdemo.azurewebsites.net/server-call/files-structure",
+					"raw": "https://spagds-devwebapp.azurewebsites.net/server-call/files-structure",
 					"protocol": "https",
 					"host": [
-						"sppaginationdemo",
+						"spagds-devwebapp",
 						"azurewebsites",
 						"net"
 					],
 					"path": [
 						"server-call",
 						"files-structure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost Paginated/DemoSelect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"pageSize\": 10,\r\n    \"currentPage\": 3,\r\n    \"customFilter\": \"test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7269/Paginated/DemoSelect",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7269",
+					"path": [
+						"Paginated",
+						"DemoSelect"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost Paginated/sql-query-identifier/DemoSelect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var resStr = pm.response.text();\r",
+							"\r",
+							"pm.collectionVariables.set(\"sql_query_identifier\", resStr);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:7269/Paginated/sql-query-identifier/DemoSelect",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7269",
+					"path": [
+						"Paginated",
+						"sql-query-identifier",
+						"DemoSelect"
 					]
 				}
 			},

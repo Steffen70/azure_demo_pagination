@@ -1,4 +1,5 @@
 using SPPaginationDemo.Filtration;
+using SPPaginationDemo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,12 +9,23 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton(builder.Configuration);
 
+builder.Services.AddSingleton<Appsettings>();
+
+builder.Services.AddSingleton<ILogger, ApiLogger>();
+
+builder.Services.AddSingleton<ExceptionMiddleware>();
+
 var app = builder.Build();
+
+var logger = app.Services.GetRequiredService<ILogger>();
+logger.LogInformation("Application started.");
 
 // Configure the HTTP request pipeline.
 
 // Todo: DS: Remove exception page in production
 app.UseDeveloperExceptionPage();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 

@@ -1,47 +1,48 @@
+# Login to Azure
 az login
 
+az account list --output table --all
+az account set --subscription 9a3d4a95-f97f-4608-bb34-b173289524ac
+
+az group list --output table
+
 # Create a resource group
-az group create --name Demo-Env --location switzerlandnorth
+az group create --name SPAGDS-Dev-RG --location switzerlandnorth
 
 # Create an Azure SQL Server
-az sql server create --name Demo-SQL-SPAG --resource-group Demo-Env --location switzerlandnorth --admin-user ds-spag --admin-password "{0}"
+az sql server create --name SPAGDS-Dev-SQL --resource-group SPAGDS-Dev-RG --location switzerlandnorth --admin-user ds-spag --admin-password "{0}"
 
 # Create an Azure SQL Database in the server
-az sql db create --resource-group Demo-Env --server Demo-SQL-SPAG --name DemoAppDb --edition Basic --zone-redundant false
+az sql db create --resource-group SPAGDS-Dev-RG --server SPAGDS-Dev-SQL --name SPAGDS-DevDB --edition Basic --zone-redundant false
 
 # Add firewall rule to allow your IP address
-az sql server firewall-rule create --resource-group Demo-Env --server Demo-SQL-SPAG --name DevAccessRule --start-ip-address 141.195.95.194 --end-ip-address 141.195.95.194
+az sql server firewall-rule create --resource-group SPAGDS-Dev-RG --server SPAGDS-Dev-SQL --name SPAGDS-Dev-IP-Access --start-ip-address 141.195.95.194 --end-ip-address 141.195.95.194
 
-# Generate Schema SQL with MSSQL wizard
-SP6 > Tasks > Generate Scripts > Specific database objects > Advanced Scripting Options > Types of data to script > Schema Only > Proceed through the wizard
-
-C:\backup\schema_export.sql
-
-# Target DemoAppDb and replace with use in script
-USE [DemoAppDb]
-
-# Backup SP6 data
-bcp SP6.dbo.Anstellungen out "C:\backup\Anstellungen.bcp" -S "SPAG-DS\SQL2019" -T -n
-bcp SP6.dbo.Personen out "C:\backup\Personen.bcp" -S "SPAG-DS\SQL2019" -T -n
-bcp SP6.dbo.Arbeitgeber out "C:\backup\Arbeitgeber.bcp" -S "SPAG-DS\SQL2019" -T -n
-bcp SP6.dbo.Abteilungen out "C:\backup\Abteilungen.bcp" -S "SPAG-DS\SQL2019" -T -n
-bcp SP6.dbo.Stiftungen out "C:\backup\Stiftungen.bcp" -S "SPAG-DS\SQL2019" -T -n
-bcp SP6.dbo.Rentner out "C:\backup\Rentner.bcp" -S "SPAG-DS\SQL2019" -T -n
-
-# Anstellungen depends on all other tables so make sure you import them first
-
-# Import Data to Azure SQL Database from .bcp files
-bcp "DemoAppDb.dbo.Rentner" in "C:\backup\Rentner.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
-bcp "DemoAppDb.dbo.Stiftungen" in "C:\backup\Stiftungen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
-bcp "DemoAppDb.dbo.Abteilungen" in "C:\backup\Abteilungen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
-bcp "DemoAppDb.dbo.Arbeitgeber" in "C:\backup\Arbeitgeber.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n -q
-bcp "DemoAppDb.dbo.Personen" in "C:\backup\Personen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
-bcp "DemoAppDb.dbo.Anstellungen" in "C:\backup\Anstellungen.bcp" -S "demo-sql-spag.database.windows.net" -U "ds-spag" -P "{0}" -n
+# Allow Azure services to access the SQL server
+az sql server firewall-rule create --name AllowAzureServices --server SPAGDS-Dev-SQL --resource-group SPAGDS-Dev-RG --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
 
 # Create an App Service Plan
-az appservice plan create --name SPPaginationDemo-Service-Plan --resource-group Demo-Env --sku F1
+az appservice plan create --name SPAGDS-Dev-ASP --resource-group SPAGDS-Dev-RG --sku F1
 
 # Create a Web App
-az webapp create --resource-group Demo-Env --plan SPPaginationDemo-Service-Plan --name SPPaginationDemo
+az webapp create --resource-group SPAGDS-Dev-RG --plan SPAGDS-Dev-ASP --name SPAGDS-DevWebApp
 
+# Create Redis instance
+az redis create --name SPAGDS-Dev-RedisDB --resource-group SPAGDS-Dev-RG --location switzerlandnorth --sku Basic --vm-size C0
+
+az redis force-reboot --name SPAGDS-Dev-RedisDB --resource-group SPAGDS-Dev-RG --reboot-type AllNodes
+
+# Create Notification Namespace and Hub
+az notification-hub namespace create --resource-group SPAGDS-Dev-RG --name SPAGDS-Dev-Notifications --location switzerlandnorth --sku Free
+
+az notification-hub create --resource-group SPAGDS-Dev-RG --namespace-name SPAGDS-Dev-Notifications --name SPAGDS-Dev-FlutterHub
+
+
+# powershell script to publish the web app
 powershell ./publish.ps1
+
+# scale up to run 3 instances
+az appservice plan update --name SPAGDS-Dev-ASP --resource-group SPAGDS-Dev-RG --sku B1 --number-of-workers 3
+
+az webapp config appsettings set --resource-group SPAGDS-Dev-RG --name SPAGDS-DevWebApp --settings WEBSITE_CLIENT_AFFINITY="False"
+

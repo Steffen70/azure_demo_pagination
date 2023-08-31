@@ -74,7 +74,7 @@ public static class HttpClientExtensions
         var modelType = assembly.GetTypes().FirstOrDefault(t => t.Name == typeName)
                         ?? throw new InvalidOperationException("The model type is not set.");
 
-        Debug.WriteLine(@"Loaded DTO From Cache");
+        Debug.WriteLine(@"Loaded DTO From RedisCacheFactory");
 
         return modelType;
     }

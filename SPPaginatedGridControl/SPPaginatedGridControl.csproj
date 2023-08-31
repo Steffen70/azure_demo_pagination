@@ -15,7 +15,8 @@
     <RemoveDir Directories="$(OutDir)" />
   </Target>
 
-  <Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' == 'Release'">
+  <!--<Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)' == 'Release'">-->
+  <Target Name="CustomPreBuildAction" BeforeTargets="PreBuildEvent">
     <Exec Command="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\SP6LogicDemoBlueprint.exe SP6LogicDemo" />
 
     <Copy SourceFiles="..\SP6LogicDemoBlueprint\bin\$(Configuration)\net7.0-windows\Blueprint_SP6LogicDemo.dll" DestinationFiles="$(OutputPath)\SP6LogicDemo.dll" />
@@ -31,17 +32,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Debug'">
+    <!--<Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Debug'">
       <HintPath>..\SP6LogicDemo\bin\$(Configuration)\net7.0-windows\SP6LogicDemo.dll</HintPath>
-    </Reference>
+    </Reference>-->
 
-    <Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Release'">
+    <!--<Reference Include="SP6LogicDemo" Condition="'$(Configuration)' == 'Release'">-->
+    <Reference Include="SP6LogicDemo">
       <HintPath>$(OutputPath)\SP6LogicDemo.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ServerPublicKey\public_key.pem">
+    <None Update="ServerEncryptionKeys\*.pem">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

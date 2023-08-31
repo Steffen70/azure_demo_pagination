@@ -3,11 +3,11 @@ using AutoMapper.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SPPaginationDemo.Filtration;
-using SPPaginationDemo.ModelGenerator;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using SPPaginationDemo.Extensions;
+using SPPaginationDemo.DtoGenerator;
+using SPPaginationDemo.SqlQueries;
+using SPPaginationDemo.Services;
+
 #pragma warning disable CS1998
 
 namespace SPPaginationDemo.Controllers;
@@ -17,96 +17,50 @@ namespace SPPaginationDemo.Controllers;
 public abstract class Sp7ControllerBase : Controller
 {
     private readonly IMapper _mapper;
-    private readonly IConfiguration _configuration;
-    public readonly string ContentRootPath;
+    private readonly Appsettings _appsettings;
+    private readonly ILogger _logger;
 
-    private static readonly Dictionary<string, DynamicTypeGenerator> DynamicTypeGenerators = new();
-
-    private string ConnectionString => string.Format(_configuration.GetConnectionString("DefaultConnection") ??
-                                                     throw new InvalidOperationException("No connection string named 'DefaultConnection' was found in the configuration."), GetDecryptedPassword(_configuration));
-
-    public string GetDecryptedPassword(IConfiguration configuration)
-    {
-        var encryptedPasswordBase64 = configuration["EncryptedPassword"];
-
-        if (string.IsNullOrEmpty(encryptedPasswordBase64))
-            throw new InvalidOperationException("No parameter named 'EncryptedPassword' was found in the configuration.");
-
-        var encryptedPasswordBytes = Convert.FromBase64String(encryptedPasswordBase64);
-
-        var rsa = RSA.Create().ImportKeyAndCache(Path.Combine(ContentRootPath, "EncryptionKeys", "private_key.pem"));
-
-        // Decrypt the password
-        var decryptedPassword = encryptedPasswordBytes.HybridDecrypt(rsa);
-        var passwordString = Encoding.UTF8.GetString(decryptedPassword);
-        return passwordString;
-    }
-
-    protected Sp7ControllerBase(IMapper mapper, IConfiguration configuration, string contentRootPath)
+    protected Sp7ControllerBase(IMapper mapper, Appsettings appsettings, ILogger logger)
     {
         _mapper = mapper;
-        _configuration = configuration;
-        ContentRootPath = contentRootPath;
-    }
-
-    private IEndpoint? GetEndpoint(string actionName)
-    {
-        var enpointType = GetType().GetNestedType(actionName, BindingFlags.Public);
-        if (enpointType == null)
-            return null;
-
-        return (IEndpoint)Activator.CreateInstance(enpointType, null)!;
+        _appsettings = appsettings;
+        _logger = logger;
     }
 
     [HttpGet("sql-query-identifier/{*actionName}")]
     public async Task<ActionResult<string>> GetSqlQueryIdentifierAsync(string actionName)
     {
-        var endpoint = GetEndpoint(actionName);
+        var generatorWrapper = new SqlGeneratorFactory(_logger, _appsettings, actionName, typeof(IDemoSelect));
 
-        if (endpoint == null)
-            return BadRequest();
+        var dtoWrapper = new RedisCacheFactory(_logger, _appsettings, generatorWrapper.SqlIdentifier);
 
-        endpoint.ControllerBase = this;
+        if (!dtoWrapper.IsCached)
+            dtoWrapper = new RedisCacheFactory(_logger, _appsettings, generatorWrapper);
 
-        var sqlQuery = await endpoint.SqlQuery;
-
-        var sqlIdentifier = DynamicTypeGenerator.GetIdentifier(sqlQuery);
-
-        if (DynamicTypeGenerators.ContainsKey(sqlIdentifier))
-            return Ok(sqlIdentifier);
-
-        var dynamicTypeGenerator = new DynamicTypeGenerator(sqlQuery, typeof(IGeneratedEntity), ConnectionString, ContentRootPath);
-        DynamicTypeGenerators.Add(sqlIdentifier, dynamicTypeGenerator);
-
-        return Ok(sqlIdentifier);
+        return Ok(dtoWrapper.SqlIdentifier);
     }
 
-    [HttpGet("assembly-bytes/{sqlIdentifier}")]
+    [HttpGet("assembly-bytes/{*sqlIdentifier}")]
     public ActionResult<string> GetAssemblyBytes(string sqlIdentifier)
     {
-        if (!DynamicTypeGenerators.ContainsKey(sqlIdentifier))
-            return BadRequest();
+        var dtoCache = new RedisCacheFactory(_logger,_appsettings, sqlIdentifier);
 
-        var dynamicTypeGenerator = DynamicTypeGenerators[sqlIdentifier];
+        if (!dtoCache.IsCached)
+            throw new InvalidOperationException("No type with the specified identifier was found in the cache.");
 
-        var assemblyBytes = dynamicTypeGenerator.AssemblyString;
-
-        return Ok(assemblyBytes);
+        return Ok(dtoCache.AssemblyString);
     }
 
     [Route("{*actionName}")]
     public async Task<IActionResult> HandleRequestAsync(string actionName)
     {
-        var endpoint = GetEndpoint(actionName);
-
-        if (endpoint == null)
+        var enpointType = GetType().GetNestedType(actionName, BindingFlags.Public);
+        if (enpointType == null)
             return BadRequest();
 
+        var endpoint = (IEndpoint)Activator.CreateInstance(enpointType, null)!;
+
         endpoint.ControllerBase = this;
-
-        var demoSelect = await endpoint.SqlQuery;
-
-        var sqlIdentifier = DynamicTypeGenerator.GetIdentifier(demoSelect);
 
         var endpointType = endpoint.GetType();
 
@@ -122,29 +76,26 @@ public abstract class Sp7ControllerBase : Controller
         dynamic filterationParamsTask = getFiltrationParamsMethod.Invoke(null, new object[] { HttpContext })!;
 
         var filtrationParams = await filterationParamsTask;
+        if (filtrationParams == null) return BadRequest();
 
-        DynamicTypeGenerators.TryGetValue(sqlIdentifier, out var dynamicTypeGenerator);
+        var generatorWrapper = new SqlGeneratorFactory(_logger,_appsettings, actionName, typeof(IDemoSelect));
 
-        if (dynamicTypeGenerator == null)
-        {
-            if (filtrationParams == null) return BadRequest();
+        var dtoWrapper = new RedisCacheFactory(_logger,_appsettings, generatorWrapper.SqlIdentifier);
 
-            dynamicTypeGenerator = new DynamicTypeGenerator(demoSelect, typeof(IGeneratedEntity), ConnectionString, ContentRootPath);
+        if (!dtoWrapper.IsCached)
+            dtoWrapper = new RedisCacheFactory(_logger,_appsettings, generatorWrapper);
 
-            DynamicTypeGenerators.Add(sqlIdentifier, dynamicTypeGenerator);
-        }
+        var generatedSp7Context = typeof(Sp7Context<>).MakeGenericType(dtoWrapper.Model);
 
-        var generatedSp7Context = typeof(Sp7Context<>).MakeGenericType(dynamicTypeGenerator.Model);
-
-        dynamic sp6Context = Activator.CreateInstance(generatedSp7Context, new DbContextOptionsBuilder().UseSqlServer(ConnectionString).Options)!;
+        dynamic sp6Context = Activator.CreateInstance(generatedSp7Context, new DbContextOptionsBuilder().UseSqlServer(_appsettings.SqlConnectionString).Options)!;
 
         var fromSqlRawMethod = typeof(RelationalQueryableExtensions).GetMethod(nameof(RelationalQueryableExtensions.FromSqlRaw))!;
 
-        var genericFromSqlRawMethod = fromSqlRawMethod.MakeGenericMethod(dynamicTypeGenerator.Model);
+        var genericFromSqlRawMethod = fromSqlRawMethod.MakeGenericMethod(dtoWrapper.Model);
 
-        dynamic selection = genericFromSqlRawMethod.Invoke(null, new object[] { sp6Context.GeneratedModel, demoSelect, Array.Empty<object>() })!;
+        dynamic selection = genericFromSqlRawMethod.Invoke(null, new object[] { sp6Context.GeneratedModel, generatorWrapper.SqlQuery, Array.Empty<object>() })!;
 
-        var genericFiltration = queryFilter.MakeGenericMethod(dynamicTypeGenerator.Model);
+        var genericFiltration = queryFilter.MakeGenericMethod(dtoWrapper.Model);
 
         var genericFiltrationTask = new Task<dynamic>(() =>
             genericFiltration.Invoke(endpoint, new object[] { selection, filtrationParams })!);
@@ -158,7 +109,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var addResultHeaderMethod = GetType().GetMethod(nameof(AddResultHeader))!;
 
-        var genericAddResultMethod = addResultHeaderMethod.MakeGenericMethod(dynamicTypeGenerator.Model, filterationParameterType, headerType);
+        var genericAddResultMethod = addResultHeaderMethod.MakeGenericMethod(dtoWrapper.Model, filterationParameterType, headerType);
 
         dynamic addResultHeaderTask = genericAddResultMethod.Invoke(this, new object[] { result, filtrationParams })!;
 
@@ -166,7 +117,7 @@ public abstract class Sp7ControllerBase : Controller
 
         var endpointMethod = endpointType.GetMethod(nameof(IEndpoint<object, FiltrationParams>.InMemoryProcessingAsync))!;
 
-        var genericEndpointMethod = endpointMethod.MakeGenericMethod(dynamicTypeGenerator.Model);
+        var genericEndpointMethod = endpointMethod.MakeGenericMethod(dtoWrapper.Model);
 
         dynamic genericEndpointTask = genericEndpointMethod.Invoke(endpoint, new object[] { modifiedModels.Result, filtrationParams })!;
 
@@ -184,8 +135,6 @@ public abstract class Sp7ControllerBase : Controller
 
     private interface IEndpoint
     {
-        Task<string> SqlQuery { get; }
-
         Sp7ControllerBase ControllerBase { get; set; }
     }
 
@@ -208,9 +157,6 @@ public abstract class Sp7ControllerBase : Controller
     public abstract class Endpoint<TInterface, TParams> : IEndpoint<TInterface, TParams> where TParams : FiltrationParams
     {
         public Sp7ControllerBase ControllerBase { get; set; } = null!;
-
-        public Task<string> SqlQuery => GetSqlQueryAsync();
-        protected virtual async Task<string> GetSqlQueryAsync() => throw new NotImplementedException();
 
         public abstract IQueryable<TGenerated> QueryFilter<TGenerated>(IQueryable<TGenerated> queryable, TParams filtrationParams) where TGenerated : class, TInterface;
 

@@ -1,17 +1,30 @@
 ﻿using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
+using SPPaginationDemo.Services;
+using StackExchange.Redis;
+
+#pragma warning disable CA2254
 
 namespace SPPaginationDemo.Extensions;
 
 public static class RsaExtensions
 {
-    private static readonly Dictionary<string, RSA> RsaCache = new();
-
-    public static RSA ImportKeyAndCache(this RSA rsa, string keyPath)
+    public static RSA ImportKeyAndCache(this RSA rsa, string keyPath, IDatabase? redisDatabase = null, ILogger? logger = null)
     {
-        if (RsaCache.TryGetValue(keyPath, out var key))
-            return key;
+        var keyName = Path.GetFileNameWithoutExtension(keyPath);
+
+        if (redisDatabase != null && redisDatabase.KeyExists(keyName))
+        {
+            var value = MemoryCache.LazyLoadAndCache(keyName, () => redisDatabase.StringGet(keyName).ToString(), out var fromMemory);
+            rsa.FromXmlString(value!);
+
+            logger?.LogInformation(!fromMemory
+                ? $"RSA key '{keyName}' loaded from Redis cache."
+                : $"RSA key '{keyName}' loaded from memory cache.");
+
+            return rsa;
+        }
 
         using var reader = File.OpenText(keyPath);
         var pemReader = new PemReader(reader);
@@ -40,7 +53,16 @@ public static class RsaExtensions
 
         rsa.ImportParameters(rsaParameters);
 
-        RsaCache.Add(keyPath, rsa);
+        if (redisDatabase != null)
+        {
+            var xmlString = rsa.ToXmlString(true);
+            redisDatabase.StringSet(keyName, xmlString);
+            MemoryCache.LazyLoadAndCache(keyName, () => xmlString);
+
+            logger?.LogInformation($"RSA key '{keyName}' loaded from file and cached in Redis.");
+        }
+        else
+            logger?.LogInformation($"RSA key '{keyName}' loaded from file.");
 
         return rsa;
     }

@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace SPPaginationDemo.Extensions;
 
-public static class ByteArrayExtension
+public static class ByteArrayExtensions
 {
     public static byte[] Compress(this byte[] data)
     {
@@ -42,15 +42,14 @@ public static class ByteArrayExtension
         using (var encryptor = aes.CreateEncryptor())
         using (var ms = new MemoryStream())
         {
-            using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
-            {
+            using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write)) 
                 cs.Write(data, 0, data.Length);
-            }
+
             encryptedData = ms.ToArray();
         }
 
         // Encrypt the AES key with the RSA public key
-        var encryptedKey = publicKey.Encrypt(aes.Key, RSAEncryptionPadding.Pkcs1);
+        var encryptedKey = publicKey.Encrypt(aes.Key, RSAEncryptionPadding.OaepSHA256);
 
         // Concatenate the AES IV, the encrypted AES key, and the encrypted data into a single array
         var result = new byte[aes.IV.Length + encryptedKey.Length + encryptedData.Length];
@@ -72,17 +71,20 @@ public static class ByteArrayExtension
         Buffer.BlockCopy(encryptedDataWithKey, iv.Length + encryptedKey.Length, encryptedData, 0, encryptedData.Length);
 
         // Decrypt the AES key with the RSA private key
-        var key = privateKey.Decrypt(encryptedKey, RSAEncryptionPadding.Pkcs1);
+        var key = privateKey.Decrypt(encryptedKey, RSAEncryptionPadding.OaepSHA256);
 
         // Decrypt the data with the AES key
         using var aes = Aes.Create();
         using var decryptor = aes.CreateDecryptor(key, iv);
-        using var ms = new MemoryStream(encryptedData);
-        using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
 
-        var data = new byte[encryptedData.Length];
-        var bytesRead = cs.Read(data, 0, data.Length);
-        Array.Resize(ref data, bytesRead);
+        using var ms = new MemoryStream();
+        using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write);
+
+        cs.Write(encryptedData, 0, encryptedData.Length);
+        cs.FlushFinalBlock();
+
+        var data = ms.ToArray();
+
         return data;
     }
 }

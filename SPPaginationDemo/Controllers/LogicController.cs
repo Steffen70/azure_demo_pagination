@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using SPPaginationDemo.Filtration;
+
 #pragma warning disable IDE0290
 
 namespace SPPaginationDemo.Controllers;
@@ -15,14 +17,16 @@ public class FileInfoModel
 }
 
 [ApiController]
-[Route("server-call/")]
+[Route("server-call")]
 public class LogicController : Controller
 {
     private readonly IWebHostEnvironment _env;
+    private readonly ILogger _logger;
 
-    public LogicController(IWebHostEnvironment env)
+    public LogicController(IWebHostEnvironment env, ILogger logger)
     {
         _env = env;
+        _logger = logger;
     }
 
     [HttpGet("files-structure")]
@@ -35,7 +39,7 @@ public class LogicController : Controller
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return StatusCode(500, $"Internal server error: '{ex.Message}'");
         }
     }
 
@@ -73,7 +77,7 @@ public class LogicController : Controller
         var json = await reader.ReadToEndAsync();
 
         // deserialize Params from json
-        var parameters = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+        var parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(json, HttpExtensions.Options);
 
         // create instance of type by typeName
         // Todo: DS: Add dependency injection pipeline
@@ -85,9 +89,13 @@ public class LogicController : Controller
 
         // if method is null return bad request with error message
         if (method == null)
-            return BadRequest($"Method {methodName} not found");
+            return BadRequest($"Method '{methodName}' not found");
 
         var result = parameters == null ? method.Invoke(instance, null) : method.Invoke(instance, parameters.Values.ToArray());
+
+#pragma warning disable CA2254
+        _logger.LogInformation($"Method '{methodName}' of type '{typeName}' was called");
+#pragma warning restore CA2254
         return Ok(result);
     }
 

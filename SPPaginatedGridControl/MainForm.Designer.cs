@@ -33,21 +33,22 @@
             bbiUpload = new DevExpress.XtraBars.BarButtonItem();
             bbiTestEndpoint = new DevExpress.XtraBars.BarButtonItem();
             bbiEncryptPassword = new DevExpress.XtraBars.BarButtonItem();
+            bbiDebug = new DevExpress.XtraBars.BarButtonItem();
+            bsiTypeLoadingElapsed = new DevExpress.XtraBars.BarStaticItem();
+            bsiDataFetchingElapsed = new DevExpress.XtraBars.BarStaticItem();
             rpMain = new DevExpress.XtraBars.Ribbon.RibbonPage();
             rpgDynamicConstruction = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             rpAdmin = new DevExpress.XtraBars.Ribbon.RibbonPage();
             rpgUpdateGroup = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             rpgDevOptions = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             pContent = new Panel();
-            bsiTypeLoadingElapsed = new DevExpress.XtraBars.BarStaticItem();
-            bsiDataFetchingElapsed = new DevExpress.XtraBars.BarStaticItem();
             ((System.ComponentModel.ISupportInitialize)rcMainRibbon).BeginInit();
             SuspendLayout();
             // 
             // rcMainRibbon
             // 
             rcMainRibbon.ExpandCollapseItem.Id = 0;
-            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiEncryptPassword, bsiTypeLoadingElapsed, bsiDataFetchingElapsed });
+            rcMainRibbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] { rcMainRibbon.ExpandCollapseItem, rcMainRibbon.SearchEditItem, bbiUpload, bbiTestEndpoint, bbiEncryptPassword, bbiDebug, bsiTypeLoadingElapsed, bsiDataFetchingElapsed });
             rcMainRibbon.Location = new Point(0, 0);
             rcMainRibbon.MaxItemId = 7;
             rcMainRibbon.Name = "rcMainRibbon";
@@ -87,6 +88,25 @@
             bbiEncryptPassword.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             bbiEncryptPassword.ItemClick += OnItemClick_bbiEncryptPassword;
             // 
+            // bbiDebug
+            // 
+            bbiDebug.Caption = "Debug";
+            bbiDebug.Id = 4;
+            bbiDebug.ImageOptions.Image = (Image)resources.GetObject("bbiDebug.ImageOptions.Image");
+            bbiDebug.Name = "bbiDebug";
+            bbiDebug.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
+            bbiDebug.ItemClick += OnItemClick_bbiDebug;
+            // 
+            // bsiTypeLoadingElapsed
+            // 
+            bsiTypeLoadingElapsed.Id = 6;
+            bsiTypeLoadingElapsed.Name = "bsiTypeLoadingElapsed";
+            // 
+            // bsiDataFetchingElapsed
+            // 
+            bsiDataFetchingElapsed.Id = 7;
+            bsiDataFetchingElapsed.Name = "bsiDataFetchingElapsed";
+            // 
             // rpMain
             // 
             rpMain.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] { rpgDynamicConstruction });
@@ -114,6 +134,7 @@
             // rpgDevOptions
             // 
             rpgDevOptions.ItemLinks.Add(bbiEncryptPassword);
+            rpgDevOptions.ItemLinks.Add(bbiDebug);
             rpgDevOptions.Name = "rpgDevOptions";
             // 
             // pContent
@@ -123,16 +144,6 @@
             pContent.Name = "pContent";
             pContent.Size = new Size(1091, 406);
             pContent.TabIndex = 1;
-            // 
-            // bsiTypeLoadingElapsed
-            // 
-            bsiTypeLoadingElapsed.Id = 6;
-            bsiTypeLoadingElapsed.Name = "bsiTypeLoadingElapsed";
-            // 
-            // bsiDataFetchingElapsed
-            // 
-            bsiDataFetchingElapsed.Id = 7;
-            bsiDataFetchingElapsed.Name = "bsiDataFetchingElapsed";
             // 
             // MainForm
             // 
@@ -145,6 +156,7 @@
             IconOptions.Icon = (Icon)resources.GetObject("MainForm.IconOptions.Icon");
             Name = "MainForm";
             Ribbon = rcMainRibbon;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "MainForm";
             ((System.ComponentModel.ISupportInitialize)rcMainRibbon).EndInit();
             ResumeLayout(false);
@@ -162,6 +174,7 @@
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgDynamicConstruction;
         private DevExpress.XtraBars.BarButtonItem bbiTestEndpoint;
         private DevExpress.XtraBars.BarButtonItem bbiEncryptPassword;
+        private DevExpress.XtraBars.BarButtonItem bbiDebug;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgDevOptions;
         private DevExpress.XtraBars.BarStaticItem bsiTypeLoadingElapsed;
         private DevExpress.XtraBars.BarStaticItem bsiDataFetchingElapsed;
