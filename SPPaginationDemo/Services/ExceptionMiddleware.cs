@@ -1,4 +1,5 @@
-﻿#pragma warning disable IDE0290
+﻿#pragma warning disable CA2254
+#pragma warning disable IDE0290
 
 namespace SPPaginationDemo.Services;
 
@@ -15,6 +16,7 @@ public class ExceptionMiddleware : IMiddleware
     {
         try
         {
+            _logger.LogInformation($"Request: {httpContext.Request.Path}");
             await next(httpContext);
         }
         catch (Exception ex)

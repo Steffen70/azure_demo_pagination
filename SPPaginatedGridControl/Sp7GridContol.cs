@@ -1,11 +1,12 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections;
+using System.Net.Http.Headers;
 using System.Text;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
-using SPPaginationDemo.Extensions;
 using SPPaginationDemo.Filtration;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+
 // ReSharper disable RedundantCatchClause
 #pragma warning disable CS0168
 
@@ -156,7 +157,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
 
             // Get the response header
             if (response.Headers.TryGetValues("Filtration", out var headerValues))
-                FiltrationHeader = await JsonSerializer.DeserializeAsync<TFiltrationHeader>(headerValues.First().GetStream());
+                FiltrationHeader = JsonSerializer.Deserialize<TFiltrationHeader>(headerValues.First(), HttpExtensions.Options);
 
             // Deserialize the body content
             var responseBody = await response.Content.ReadAsStringAsync();
@@ -164,9 +165,7 @@ public sealed class Sp7GridControl<TFiltrationParams, TFiltrationHeader> : GridC
             var genericListType = typeof(List<>);
             var specificListType = genericListType.MakeGenericType(_modelType);
 
-#pragma warning disable CA2012
-            var data = await (dynamic)JsonSerializer.DeserializeAsync(responseBody.GetStream(), specificListType);
-#pragma warning restore CA2012
+            var data = (dynamic)JsonSerializer.Deserialize(responseBody, specificListType, HttpExtensions.Options)!;
 
             // Add the data to the Grid's DataSource
             _defaultDataSource.AddRange(data);

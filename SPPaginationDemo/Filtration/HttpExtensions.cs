@@ -15,7 +15,10 @@ public static class HttpExtensions
         httpContext.Request.Body.Position = 0;
 
         // Read the request body and deserialize it into an object of type TParams
-        var body = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
+
+        using var reader = new StreamReader(httpContext.Request.Body);
+        var body = await reader.ReadToEndAsync();
+
         var filtrationParams = JsonSerializer.Deserialize<TParams>(body, Options);
 
         // Rewind the request stream to the beginning so it can be read again by the next middleware

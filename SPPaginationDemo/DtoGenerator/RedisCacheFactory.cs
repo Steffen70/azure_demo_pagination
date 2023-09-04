@@ -1,4 +1,5 @@
-﻿using SPPaginationDemo.Services;
+﻿using SPPaginationDemo.CallLogger;
+using SPPaginationDemo.Services;
 using StackExchange.Redis;
 
 #pragma warning disable CA2254
@@ -9,14 +10,19 @@ public class RedisCacheFactory : BaseFactory
 {
     private readonly Appsettings _appsettings;
 
+    [Log]
     private IDatabase RedisDatabase => _appsettings.RedisDatabase;
 
+    [Log]
     private string RedisGeneratorLockKey => $"{SqlIdentifier}_Lock";
 
+    [Log]
     public sealed override string SqlIdentifier { get; }
 
+    [Log]
     public bool IsCached => RedisDatabase.KeyExists(SqlIdentifier);
 
+    [Log]
     public override string AssemblyString
     {
         get
@@ -30,12 +36,14 @@ public class RedisCacheFactory : BaseFactory
         }
     }
 
+    [Log]
     public RedisCacheFactory(ILogger logger, Appsettings appsettings, string sqlIdentifier) : base(logger)
     {
         SqlIdentifier = sqlIdentifier;
         _appsettings = appsettings;
     }
 
+    [Log]
     public RedisCacheFactory(ILogger logger, Appsettings appsettings, BaseFactory dtoFactory) : base(logger)
     {
         if (dtoFactory is RedisCacheFactory)
@@ -62,6 +70,7 @@ public class RedisCacheFactory : BaseFactory
         Logger.LogInformation($"Added assembly string to cache for '{SqlIdentifier}'.");
     }
 
+    [Log]
     private bool AwaitRedisLock()
     {
         while (true)

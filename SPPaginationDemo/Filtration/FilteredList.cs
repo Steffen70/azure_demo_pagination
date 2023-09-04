@@ -1,15 +1,20 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SPPaginationDemo.CallLogger;
 
 namespace SPPaginationDemo.Filtration;
 
 public class FilteredList<TList, THeader> where THeader : FiltrationHeader
 {
+    [Log]
     public THeader Header { get; private set; } = null!;
+    [Log]
     public List<TList> Result { get; } = new();
 
+    [Log]
     public FilteredList() { }
 
+    [Log]
     public FilteredList(IEnumerable<TList> items, THeader header)
     {
         Header = header;
@@ -17,6 +22,7 @@ public class FilteredList<TList, THeader> where THeader : FiltrationHeader
         Result.AddRange(items);
     }
 
+    [Log]
     public static async Task<FilteredList<TList, THeader>> CreateAsync<TParams>(
         IQueryable<TList> source, TParams @params, IMapper mapper)
         where TParams : FiltrationParams
@@ -26,6 +32,7 @@ public class FilteredList<TList, THeader> where THeader : FiltrationHeader
         return new FilteredList<TList, THeader>(items, header);
     }
 
+    [Log]
     public static async Task<FilteredList<TList, THeader>> CreateAndMapInMemoryAsync<TParams, TEntity>(
         IQueryable<TEntity> source, TParams @params, IMapper mapper)
         where TParams : FiltrationParams
@@ -37,11 +44,13 @@ public class FilteredList<TList, THeader> where THeader : FiltrationHeader
         return new FilteredList<TList, THeader>(dtos, header);
     }
 
+    [Log]
     protected static async Task<Tuple<IEnumerable<TList>, THeader>> FetchDataAsync<TParams>(
         IQueryable<TList> source, TParams @params, IMapper mapper)
         where TParams : FiltrationParams
         => await FetchDataAsync<TList, TParams>(source, @params, mapper);
 
+    [Log]
     protected static async Task<Tuple<IEnumerable<T>, THeader>> FetchDataAsync<T, TParams>(
         IQueryable<T> source, TParams @params, IMapper mapper)
         where TParams : FiltrationParams

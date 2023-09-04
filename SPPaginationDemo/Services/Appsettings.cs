@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
+using SPPaginationDemo.CallLogger;
 using SPPaginationDemo.Extensions;
 using StackExchange.Redis;
 using System.Security.Cryptography;
@@ -15,13 +16,18 @@ public class Appsettings : IConfiguration
 
     public string ContentRootPath { get; }
 
+    [Log]
     private ILogger Logger => MemoryCache.LazyLoadAndCache("Logger", _serviceProvider.GetRequiredService<ILogger>);
+    [Log]
     public IDatabase RedisDatabase => MemoryCache.LazyLoadAndCache("RedisDatabase", () => ConnectionMultiplexer.Connect(RedisConnectionString).GetDatabase());
 
     private const string ConnectionStringExceptionMessage = "No connection string named '{0}' was found in the configuration.";
+    [Log]
     public string RedisConnectionString => MemoryCache.LazyLoadAndCache("RedisConnectionString", () => GetConnectionString("Redis", "RedisPrimary", ConnectionStringExceptionMessage, false));
+    [Log]
     public string SqlConnectionString => MemoryCache.LazyLoadAndCache("SqlConnectionString", () => GetConnectionString("Sql", "Sql", ConnectionStringExceptionMessage));
 
+    [Log]
     public Appsettings(IConfiguration configuration, IHostEnvironment env, IServiceProvider serviceProvider)
     {
         ContentRootPath = env.ContentRootPath;
@@ -29,6 +35,7 @@ public class Appsettings : IConfiguration
         _serviceProvider = serviceProvider;
     }
 
+    [Log]
     public string GetDecryptedPassword(string keyIdentifier, bool cacheOnRedis = true)
     {
         var encryptedPasswordBase64 = _configuration[$"EncryptedPasswords:{keyIdentifier}"];
@@ -46,6 +53,7 @@ public class Appsettings : IConfiguration
         return passwordString;
     }
 
+    [Log]
     private string GetConnectionString(string name, string passwordKey, string exceptionMessage, bool cacheOnRedis = true)
     {
         var connString = _configuration.GetConnectionString(name) ??
@@ -54,15 +62,19 @@ public class Appsettings : IConfiguration
         return string.Format(connString, password);
     }
 
+    [Log]
     public string? this[string key]
     {
         get => _configuration[key];
         set => _configuration[key] = value;
     }
 
+    [Log]
     public IEnumerable<IConfigurationSection> GetChildren() => _configuration.GetChildren();
 
+    [Log]
     public IChangeToken GetReloadToken() => _configuration.GetReloadToken();
 
+    [Log]
     public IConfigurationSection GetSection(string key) => _configuration.GetSection(key);
 }

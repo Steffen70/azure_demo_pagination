@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
+using SPPaginationDemo.CallLogger;
 using SPPaginationDemo.Services;
 using StackExchange.Redis;
 
@@ -10,6 +11,7 @@ namespace SPPaginationDemo.Extensions;
 
 public static class RsaExtensions
 {
+    [Log]
     public static RSA ImportKeyAndCache(this RSA rsa, string keyPath, IDatabase? redisDatabase = null, ILogger? logger = null)
     {
         var keyName = Path.GetFileNameWithoutExtension(keyPath);

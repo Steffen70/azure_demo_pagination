@@ -31,18 +31,19 @@ public class ApiLogger : ILogger
             return;
 
         var message = formatter(state, exception);
-        var logEntry = new
-        {
-            InstanceId,
-            Timestamp = DateTime.UtcNow,
-            LogLevel = logLevel,
-            Message = message,
-            StackTrace = logLevel == LogLevel.Error ? exception?.StackTrace : null,
-        };
+        var logEntry = new LogEntry(InstanceId, DateTime.UtcNow, logLevel, message, logLevel == LogLevel.Error ? exception?.StackTrace : null);
 
         var logEntryJson = JsonSerializer.Serialize(logEntry, HttpExtensions.Options);
 
         _database.ListRightPush("Logs", logEntryJson);
+    }
+
+    public record LogEntry(Guid InstanceId, DateTime Timestamp, LogLevel LogLevel, string Message, string? StackTrace)
+    {
+        public override string ToString()
+        {
+            return $"{{ InstanceId = {InstanceId}, Timestamp = {Timestamp}, LogLevel = {LogLevel}, Message = {Message}, StackTrace = {StackTrace} }}";
+        }
     }
 }
 

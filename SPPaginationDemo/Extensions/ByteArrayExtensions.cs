@@ -1,10 +1,12 @@
-﻿using System.IO.Compression;
+﻿using SPPaginationDemo.CallLogger;
+using System.IO.Compression;
 using System.Security.Cryptography;
 
 namespace SPPaginationDemo.Extensions;
 
 public static class ByteArrayExtensions
 {
+    [Log]
     public static byte[] Compress(this byte[] data)
     {
         using var compressedStream = new MemoryStream();
@@ -15,6 +17,7 @@ public static class ByteArrayExtensions
         return compressedStream.ToArray();
     }
 
+    [Log]
     public static byte[] Decompress(this byte[] data)
     {
         using var compressedStream = new MemoryStream(data);
@@ -29,6 +32,7 @@ public static class ByteArrayExtensions
         return resultStream.ToArray();
     }
 
+    [Log]
     public static byte[] HybridEncrypt(this byte[] data, RSA publicKey)
     {
         // Generate a new AES key

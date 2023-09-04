@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using SPPaginationDemo.CallLogger;
 using SPPaginationDemo.Extensions;
 using SPPaginationDemo.Services;
 
@@ -14,11 +15,14 @@ public abstract class BaseFactory
 
     public abstract string SqlIdentifier { get; }
 
+    [Log]
     public string TypeName => $"DynamicType_{SqlIdentifier}";
 
+    [Log]
     public byte[] AssemblyBytes =>
         MemoryCache.LazyLoadAndCache($"{TypeName}_AssemblyBytes", () => Convert.FromBase64String(AssemblyString).Decompress());
 
+    [Log]
     public Type Model
     {
         get

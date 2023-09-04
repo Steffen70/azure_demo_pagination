@@ -1,3 +1,4 @@
+using SPPaginationDemo.CallLogger;
 using SPPaginationDemo.Filtration;
 using SPPaginationDemo.Services;
 
@@ -19,6 +20,9 @@ var app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILogger>();
 logger.LogInformation("Application started.");
+
+// Redirect console output to logger
+Console.SetOut(new LoggerTextWriter(logger));
 
 // Configure the HTTP request pipeline.
 

@@ -5,6 +5,7 @@ using System.Text;
 using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using SPPaginationDemo.CallLogger;
 using SPPaginationDemo.Extensions;
 using SPPaginationDemo.Services;
 #pragma warning disable CA2254
@@ -20,10 +21,13 @@ public class SqlGeneratorFactory : BaseFactory
     private readonly Appsettings _appsettings;
 
     // Todo: DS: Check update time of the sql query file and update the cache if it has changed.
+    [Log]
     public string SqlQuery => MemoryCache.LazyLoadAndCache($"{_actionName}_Query", () => File.ReadAllText(Path.Combine(_appsettings.ContentRootPath, "SqlQueries", $"{_actionName}.sql")));
 
+    [Log]
     public override string AssemblyString => MemoryCache.LazyLoadAndCache(SqlIdentifier, GetAssemblyString);
 
+    [Log]
     private string GetAssemblyString()
     {
         var columns = AnalyzeQuery(SqlQuery, _appsettings.SqlConnectionString);
@@ -78,8 +82,10 @@ public class SqlGeneratorFactory : BaseFactory
     }
 
     // Todo: DS: Check update timestamp of sql file and recompile if changed
+    [Log]
     public override string SqlIdentifier => MemoryCache.LazyLoadAndCache(_actionName, GetSqlIdentifier);
 
+    [Log]
     private string GetSqlIdentifier()
     {
         var hash = MD5.HashData(Encoding.UTF8.GetBytes(SqlQuery));
@@ -91,6 +97,7 @@ public class SqlGeneratorFactory : BaseFactory
         return hexString;
     }
 
+    [Log]
     public SqlGeneratorFactory(ILogger logger, Appsettings appsettings, string actionName, Type interfaceType) : base(logger)
     {
         _appsettings = appsettings;
@@ -99,6 +106,7 @@ public class SqlGeneratorFactory : BaseFactory
         _interfaceType = interfaceType;
     }
 
+    [Log]
     private IEnumerable<(string ColumnName, Type DataType)> AnalyzeQuery(string sqlQuery, string connectionString)
     {
         using var connection = new SqlConnection(connectionString);
