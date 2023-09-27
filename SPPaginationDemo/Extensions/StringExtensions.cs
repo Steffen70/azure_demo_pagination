@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using static System.Text.RegularExpressions.Regex;
 
@@ -21,5 +22,14 @@ public static class StringExtensions
         str = str.Replace("<", string.Empty);
 
         return str;
+    }
+
+    public static string GenerateMd5Hash(this string str)
+    {
+        var hash = MD5.HashData(Encoding.UTF8.GetBytes(str));
+
+        var hexString = string.Concat(hash.Select(b => b.ToString("X2")));
+
+        return hexString;
     }
 }

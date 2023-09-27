@@ -4,6 +4,7 @@ using SPPaginationDemo.Extensions;
 using StackExchange.Redis;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Azure.NotificationHubs;
 
 #pragma warning disable IDE0290
 
@@ -20,12 +21,16 @@ public class Appsettings : IConfiguration
     private ILogger Logger => MemoryCache.LazyLoadAndCache("Logger", _serviceProvider.GetRequiredService<ILogger>);
     [Log]
     public IDatabase RedisDatabase => MemoryCache.LazyLoadAndCache("RedisDatabase", () => ConnectionMultiplexer.Connect(RedisConnectionString).GetDatabase());
+    [Log]
+    public NotificationHubClient NotificationHubClient => MemoryCache.LazyLoadAndCache("NotificationHubClient", () => NotificationHubClient.CreateClientFromConnectionString(NotificationHubConectionString, "SPAGDS-Dev-FlutterHub"));
 
     private const string ConnectionStringExceptionMessage = "No connection string named '{0}' was found in the configuration.";
     [Log]
     public string RedisConnectionString => MemoryCache.LazyLoadAndCache("RedisConnectionString", () => GetConnectionString("Redis", "RedisPrimary", ConnectionStringExceptionMessage, false));
     [Log]
     public string SqlConnectionString => MemoryCache.LazyLoadAndCache("SqlConnectionString", () => GetConnectionString("Sql", "Sql", ConnectionStringExceptionMessage));
+    [Log]
+    public string NotificationHubConectionString => MemoryCache.LazyLoadAndCache("NotificationHubConectionString", () => GetConnectionString("NotificationHub", "NotificationHub", ConnectionStringExceptionMessage));
 
     [Log]
     public Appsettings(IConfiguration configuration, IHostEnvironment env, IServiceProvider serviceProvider)

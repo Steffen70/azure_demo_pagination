@@ -88,9 +88,7 @@ public class SqlGeneratorFactory : BaseFactory
     [Log]
     private string GetSqlIdentifier()
     {
-        var hash = MD5.HashData(Encoding.UTF8.GetBytes(SqlQuery));
-
-        var hexString = string.Concat(hash.Select(b => b.ToString("X2")));
+        var hexString = SqlQuery.GenerateMd5Hash();
 
         Logger.LogInformation($"Generated new SqlIdentifier '{hexString}' for '{_actionName}'");
 

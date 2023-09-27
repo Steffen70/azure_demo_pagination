@@ -1,30 +1,24 @@
 ﻿using SPPaginationDemo.CallLogger;
+using System.Collections.Concurrent;
+
+// ReSharper disable InconsistentlySynchronizedField
 
 namespace SPPaginationDemo.Services;
 
 public static class MemoryCache
 {
-    private static readonly Dictionary<string, object> Cache = new();
+    //Todo: DS: Replace MemoryCache class with Generator that creates getters with backing fields
+    private static readonly ConcurrentDictionary<string, object> Cache = new();
 
     [Log]
-    public static T LazyLoadAndCache<T>(string key, Func<T> valueFactory) => LazyLoadAndCache(key, valueFactory, out _);
+    public static T LazyLoadAndCache<T>(string key, Func<T> valueFactory)
+        => (T)Cache.GetOrAdd(key, new Lazy<object>(() => valueFactory()!, LazyThreadSafetyMode.ExecutionAndPublication));
 
     [Log]
     public static T LazyLoadAndCache<T>(string key, Func<T> valueFactory, out bool fromMemory)
     {
-        lock (Cache) 
-        {
-            if (Cache.TryGetValue(key, out var value))
-            {
-                fromMemory = true;
-                return (T)value;
-            }
+        fromMemory = Cache.ContainsKey(key);
 
-            var newValue = valueFactory();
-            Cache[key] = newValue!;
-
-            fromMemory = false;
-            return newValue;
-        }
+        return (T)Cache.GetOrAdd(key, new Lazy<object>(() => valueFactory()!, LazyThreadSafetyMode.ExecutionAndPublication));
     }
 }

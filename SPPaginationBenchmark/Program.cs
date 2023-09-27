@@ -51,7 +51,7 @@ var testProcess = async () =>
 };
 
 var tasks = new List<Task<int>>();
-for (var i = 0; i < 100; i++) tasks.Add(new Task<int>(() => testProcess().Result));
+for (var i = 0; i < 5; i++) tasks.Add(new Task<int>(() => testProcess().Result));
 
 tasks.ForEach(t =>
 {

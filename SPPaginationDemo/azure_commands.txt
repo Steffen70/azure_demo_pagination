@@ -33,9 +33,9 @@ az redis create --name SPAGDS-Dev-RedisDB --resource-group SPAGDS-Dev-RG --locat
 az redis force-reboot --name SPAGDS-Dev-RedisDB --resource-group SPAGDS-Dev-RG --reboot-type AllNodes
 
 # Create Notification Namespace and Hub
-az notification-hub namespace create --resource-group SPAGDS-Dev-RG --name SPAGDS-Dev-Notifications --location switzerlandnorth --sku Free
+az notification-hub namespace create --resource-group SPAGDS-Dev-RG --name SPAGDS-Dev-Notifications --sku Free --location westeurope
 
-az notification-hub create --resource-group SPAGDS-Dev-RG --namespace-name SPAGDS-Dev-Notifications --name SPAGDS-Dev-FlutterHub
+az notification-hub create --resource-group SPAGDS-Dev-RG --namespace-name SPAGDS-Dev-Notifications --name SPAGDS-Dev-FlutterHub --location westeurope
 
 
 # powershell script to publish the web app

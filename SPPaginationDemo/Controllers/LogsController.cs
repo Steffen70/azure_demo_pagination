@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SPPaginationDemo.Filtration;
 using SPPaginationDemo.Services;
@@ -34,7 +35,9 @@ public class LogsController : ControllerBase
         {
             var timestamp = string.IsNullOrWhiteSpace(timezone) ? entry.Timestamp : TimeZoneInfo.ConvertTime(entry.Timestamp, TimeZoneInfo.Utc, TimeZoneInfo.FindSystemTimeZoneById(timezone));
 
-            list.Add($"{timestamp:dd.MM.yyyy HH:mm:ss.fff} {entry.LogLevel} {entry.InstanceId} {entry.Message} {entry.StackTrace?.Split('\n')[1] ?? string.Empty}");
+            var entryStackTraceBase64 = entry.StackTrace != null ? Convert.ToBase64String(Encoding.UTF8.GetBytes(entry.StackTrace)) : string.Empty;
+
+            list.Add($"{timestamp:dd.MM.yyyy HH:mm:ss.fff} {entry.LogLevel} {entry.InstanceId} {entry.Message} {entryStackTraceBase64}");
 
             return list;
         });
